@@ -1,0 +1,55 @@
+diff --git a/tests/_plugins/ui/_impl/tables/test_default_table.py b/tests/_plugins/ui/_impl/tables/test_default_table.py
+index e5dd762..6cb4b98 100644
+--- a/tests/_plugins/ui/_impl/tables/test_default_table.py
++++ b/tests/_plugins/ui/_impl/tables/test_default_table.py
+@@ -1313,6 +1313,30 @@ class TestMismatchedColumnLengths(unittest.TestCase):
+             {"a": 3, "b": None},
+         ]
+ 
++    def test_select_rows_pads_short_columns(self) -> None:
++        data = {"a": [2], "b": [10, 20]}
++        mgr = DefaultTableManager(data)
++        assert mgr.select_rows([1]).data == {"a": [None], "b": [20]}
++        assert mgr.select_rows([0, 1]).data == {"a": [2, None], "b": [10, 20]}
++        assert data == {"a": [2], "b": [10, 20]}
++
++    def test_search_pads_short_columns(self) -> None:
++        mgr = DefaultTableManager({"a": [2], "b": [10, 20]})
++        assert mgr.search("20").data == {"a": [None], "b": [20]}
++        assert mgr.search("none").data == {"a": [None], "b": [20]}
++
++    def test_select_cells_pads_short_columns(self) -> None:
++        mgr = DefaultTableManager({"a": [2], "b": [10, 20]})
++        assert mgr.select_cells(
++            [
++                TableCoordinate(row_id=1, column_name="a"),
++                TableCoordinate(row_id=1, column_name="b"),
++            ]
++        ) == [
++            TableCell(row=1, column="a", value=None),
++            TableCell(row=1, column="b", value=20),
++        ]
++
+ 
+ def test_validate_header_tooltip_valid() -> None:
+     columns = {"name", "age", "birth_year"}
+diff --git a/tests/_plugins/ui/_impl/test_table.py b/tests/_plugins/ui/_impl/test_table.py
+index 99015de..652cef5 100644
+--- a/tests/_plugins/ui/_impl/test_table.py
++++ b/tests/_plugins/ui/_impl/test_table.py
+@@ -629,6 +629,15 @@ def test_search_sort_mismatched_columns_with_pagination(
+     assert data == {"a": [2], "b": [10, 20]}
+ 
+ 
++def test_select_rows_mismatched_columns() -> None:
++    data = {"a": [2], "b": [10, 20]}
++    table = ui.table(data, selection="multi")
++
++    assert table._convert_value(["0", "1"]) == {"a": [2, None], "b": [10, 20]}
++    assert table._convert_value(["1"]) == {"a": [None], "b": [20]}
++    assert data == {"a": [2], "b": [10, 20]}
++
++
+ def test_search_sort_nonexistent_columns() -> None:
+     data = ["banana", "apple", "cherry", "date", "elderberry"]
+     table = ui.table(data)

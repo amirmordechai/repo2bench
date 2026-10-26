@@ -1,0 +1,20 @@
+version = "1.0"
+
+[metadata]
+id = "pydantic-ai-medium-keep_dict_key_order_in_histories_t_pr11137"
+repo = "pydantic/pydantic-ai"
+commit_sha = "bfe3f6d63ac40c17f41c6cd3b206bcdcc58878ca"
+parent_sha = "47d71b8910e2e73995e5a394f69c65cb34c476a1"
+committed_date = "2026-10-23T13:57:27Z"
+difficulty = "medium"
+category = "code"
+role = "swe"
+
+[environment]
+os = "linux"
+
+[agent]
+timeout_sec = 900
+
+[verifier]
+timeout_sec = 300

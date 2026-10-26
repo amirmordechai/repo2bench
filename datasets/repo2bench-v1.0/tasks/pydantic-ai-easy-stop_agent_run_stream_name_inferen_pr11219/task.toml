@@ -1,0 +1,20 @@
+version = "1.0"
+
+[metadata]
+id = "pydantic-ai-easy-stop_agent_run_stream_name_inferen_pr11219"
+repo = "pydantic/pydantic-ai"
+commit_sha = "3ea7e54e1203456c590db15deca04f771f14ab32"
+parent_sha = "fdde3c214256ec2f9eb5a59cec9ff3b2ca844b11"
+committed_date = "2026-10-24T17:21:18Z"
+difficulty = "easy"
+category = "code"
+role = "swe"
+
+[environment]
+os = "linux"
+
+[agent]
+timeout_sec = 600
+
+[verifier]
+timeout_sec = 300

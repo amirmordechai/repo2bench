@@ -1,0 +1,20 @@
+version = "1.0"
+
+[metadata]
+id = "marimo-medium-handle_any_non_encodable_character_pr11079"
+repo = "marimo-team/marimo"
+commit_sha = "516b34fd73dc4dada5aec35b02a21341bc925b13"
+parent_sha = "fc918bdcd097937ab560e2586bbdef7e9f520158"
+committed_date = "2026-10-02T15:41:43-07:00"
+difficulty = "medium"
+category = "code"
+role = "swe"
+
+[environment]
+os = "linux"
+
+[agent]
+timeout_sec = 900
+
+[verifier]
+timeout_sec = 300

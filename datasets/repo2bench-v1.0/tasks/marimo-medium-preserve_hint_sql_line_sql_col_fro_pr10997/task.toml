@@ -1,0 +1,20 @@
+version = "1.0"
+
+[metadata]
+id = "marimo-medium-preserve_hint_sql_line_sql_col_fro_pr10997"
+repo = "marimo-team/marimo"
+commit_sha = "330ca4113aa5c365b3314910eb741c69aae08acf"
+parent_sha = "9bc92717addc6c73327c179cc87cf9f18ff3f7ec"
+committed_date = "2026-10-20T12:28:02+08:00"
+difficulty = "medium"
+category = "code"
+role = "swe"
+
+[environment]
+os = "linux"
+
+[agent]
+timeout_sec = 900
+
+[verifier]
+timeout_sec = 300

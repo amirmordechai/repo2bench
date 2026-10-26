@@ -1,0 +1,20 @@
+version = "1.0"
+
+[metadata]
+id = "marimo-hard-gate_host_integration_behind_marim_pr11302"
+repo = "marimo-team/marimo"
+commit_sha = "c6226418c35879780d4ee6c71fad601eff89bb92"
+parent_sha = "f377e91ef38ffbc94ea59d39e455f92e113657fb"
+committed_date = "2026-10-19T10:51:21-04:00"
+difficulty = "hard"
+category = "code"
+role = "swe"
+
+[environment]
+os = "linux"
+
+[agent]
+timeout_sec = 1200
+
+[verifier]
+timeout_sec = 300

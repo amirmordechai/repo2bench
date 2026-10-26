@@ -1,0 +1,85 @@
+diff --git a/tests/test_http_client_defaults.py b/tests/test_http_client_defaults.py
+index 5dbe4db0e..8b17f6e2d 100644
+--- a/tests/test_http_client_defaults.py
++++ b/tests/test_http_client_defaults.py
+@@ -7,32 +7,12 @@ transport without a public accessor, so the tests record what the client hands i
+ 
+ from __future__ import annotations
+ 
+-from typing import Any
+-
+ import httpx
+ import httpx2
+-import pytest
+ 
+ from pydantic_ai.models import create_async_http_client, create_async_httpx2_client, get_user_agent
+ 
+ 
+-@pytest.fixture
+-def transport_limits(monkeypatch: pytest.MonkeyPatch) -> list[httpx.Limits | httpx2.Limits]:
+-    """Record the `limits` every HTTPX transport (either family) is constructed with."""
+-    recorded: list[httpx.Limits | httpx2.Limits] = []
+-
+-    for transport_class in (httpx2.AsyncHTTPTransport, httpx.AsyncHTTPTransport):
+-        original_init = transport_class.__init__
+-
+-        def recording_init(self: Any, *args: Any, _original_init: Any = original_init, **kwargs: Any) -> None:
+-            recorded.append(kwargs['limits'])
+-            _original_init(self, *args, **kwargs)
+-
+-        monkeypatch.setattr(transport_class, '__init__', recording_init)
+-
+-    return recorded
+-
+-
+ async def test_httpx2_client_defaults(transport_limits: list[httpx.Limits | httpx2.Limits]):
+     async with create_async_httpx2_client() as client:
+         assert client.timeout == httpx2.Timeout(600, connect=5)
+@@ -63,6 +43,27 @@ async def test_httpx2_client_numeric_timeout():
+         assert client.timeout == httpx2.Timeout(30)
+ 
+ 
++async def test_httpx2_client_custom_transport(transport_limits: list[httpx.Limits | httpx2.Limits]):
++    """Requests go through the given transport, and the client keeps its timeouts, user agent and connect cap."""
++    requests: list[httpx2.Request] = []
++
++    def handler(request: httpx2.Request) -> httpx2.Response:
++        requests.append(request)
++        return httpx2.Response(200)
++
++    async with create_async_httpx2_client(transport=httpx2.MockTransport(handler)) as client:
++        assert client.timeout == httpx2.Timeout(600, connect=5)
++        response = await client.get('https://example.com', timeout=30)
++
++    assert response.status_code == 200
++    assert len(requests) == 1
++    assert requests[0].headers['User-Agent'] == get_user_agent()
++    # `ConnectPoolTimeoutCap` keeps the 30-second request timeout from lengthening the 5-second connect timeout.
++    assert requests[0].extensions['timeout'] == {'connect': 5, 'read': 30, 'write': 30, 'pool': 30}
++    # The given transport owns the connection pool: the client builds no transport of its own.
++    assert transport_limits == []
++
++
+ async def test_legacy_httpx_client_defaults(transport_limits: list[httpx.Limits | httpx2.Limits]):
+     async with create_async_http_client() as client:
+         assert client.timeout == httpx.Timeout(600, connect=5)
+diff --git a/tests/test_tenacity.py b/tests/test_tenacity.py
+index 24b39266a..7dae7b7cb 100644
+--- a/tests/test_tenacity.py
++++ b/tests/test_tenacity.py
+@@ -42,6 +42,15 @@ ignore_deprecation = pytest.mark.filterwarnings('ignore::pydantic_ai._warnings.P
+ class TestHTTPX2TenacityTransport:
+     """`httpx2` retry transports use the same Tenacity configuration as their `httpx` predecessors."""
+ 
++    def test_default_wrapped_transports_use_pydantic_ai_pool_limits(self, transport_limits: list[httpx2.Limits]):
++        """Without `wrapped`, each transport sends through one with the pool limits of Pydantic AI's own clients."""
++        sync_transport = HTTPX2TenacityTransport(config=RetryConfig())
++        async_transport = AsyncHTTPX2TenacityTransport(config=RetryConfig())
++
++        assert isinstance(sync_transport.wrapped, httpx2.HTTPTransport)
++        assert isinstance(async_transport.wrapped, httpx2.AsyncHTTPTransport)
++        assert transport_limits == [httpx2.Limits(max_connections=1000, max_keepalive_connections=100)] * 2
++
+     def test_sync_transport_passes_response_without_validator_and_closes_wrapped_transport(self):
+         request = httpx2.Request('GET', 'https://example.com')
+         response = httpx2.Response(200, request=request)

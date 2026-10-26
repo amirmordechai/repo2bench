@@ -1,0 +1,20 @@
+version = "1.0"
+
+[metadata]
+id = "pydantic-ai-easy-detect_pydantic_ai_minted_gemini_t_pr11109"
+repo = "pydantic/pydantic-ai"
+commit_sha = "124b806efa6ddc417a0a7a5d60add27584358c04"
+parent_sha = "14e75a0e120058d3ff0f0b490cd80188732f55fb"
+committed_date = "2026-10-23T04:01:34Z"
+difficulty = "easy"
+category = "code"
+role = "swe"
+
+[environment]
+os = "linux"
+
+[agent]
+timeout_sec = 600
+
+[verifier]
+timeout_sec = 300

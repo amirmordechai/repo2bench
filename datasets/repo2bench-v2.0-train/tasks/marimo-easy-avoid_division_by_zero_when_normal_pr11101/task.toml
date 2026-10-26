@@ -1,0 +1,20 @@
+version = "1.0"
+
+[metadata]
+id = "marimo-easy-avoid_division_by_zero_when_normal_pr11101"
+repo = "marimo-team/marimo"
+commit_sha = "342acf57f2ad38dbfe1eddd095fdd601318198da"
+parent_sha = "52111396d1d13ec52d2d931ffb909526b7f9f25e"
+committed_date = "2026-10-06T18:13:28+08:00"
+difficulty = "easy"
+category = "code"
+role = "swe"
+
+[environment]
+os = "linux"
+
+[agent]
+timeout_sec = 600
+
+[verifier]
+timeout_sec = 300

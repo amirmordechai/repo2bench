@@ -1,0 +1,74 @@
+diff --git a/tests/_sql/test_sql.py b/tests/_sql/test_sql.py
+index 2733c5bfc..45094b4ce 100644
+--- a/tests/_sql/test_sql.py
++++ b/tests/_sql/test_sql.py
+@@ -333,6 +333,38 @@ def test_invalid_sql(
+     assert isinstance(exc_info.value.__cause__, sqlalchemy.exc.StatementError)
+ 
+ 
++@pytest.mark.skipif(not HAS_DUCKDB, reason="DuckDB not installed")
++def test_sql_preserves_structured_error_details(
++    duckdb_connection: duckdb.DuckDBPyConnection,
++) -> None:
++    """mo.sql must not drop hint/sql_line/sql_col from engine-reported
++    MarimoSQLException (issue #10987)."""
++    from marimo._sql.engines.duckdb import DuckDBEngine
++    from marimo._sql.error_utils import MarimoSQLException
++
++    original_execute = DuckDBEngine.execute
++
++    def raising_execute(_engine: object, query: str) -> object:
++        raise MarimoSQLException(
++            message="boom",
++            sql_statement=query,
++            sql_line=3,
++            sql_col=12,
++            hint="try CAST",
++        )
++
++    DuckDBEngine.execute = raising_execute  # type: ignore[method-assign]
++    try:
++        with pytest.raises(MarimoSQLException) as exc_info:
++            sql("SELECT * FROM t", engine=duckdb_connection)
++        assert exc_info.value.sql_line == 3
++        assert exc_info.value.sql_col == 12
++        assert exc_info.value.hint == "try CAST"
++        assert exc_info.value.sql_statement == "SELECT * FROM t"
++    finally:
++        DuckDBEngine.execute = original_execute  # type: ignore[method-assign]
++
++
+ # TODO
+ @pytest.mark.skipif(not HAS_PANDAS, reason="Pandas not installed")
+ def test_sql_with_limit() -> None:
+diff --git a/tests/_sql/test_sql_error_handling.py b/tests/_sql/test_sql_error_handling.py
+index 6169a4850..5a7a4f673 100644
+--- a/tests/_sql/test_sql_error_handling.py
++++ b/tests/_sql/test_sql_error_handling.py
+@@ -235,6 +235,26 @@ class TestErrorUtilityFunctions:
+             # Hint field should exist (may be None for this error)
+             assert hasattr(error, "hint")
+ 
++    def test_create_sql_error_forwards_position_without_hint(self):
++        """Coordinates (sql_line/sql_col) must be forwarded even when hint is
++        None — engines may report position without a hint (issue #10987)."""
++
++        class MockCell:
++            sqls = ["SELECT * FROM t"]
++
++        exception = MarimoSQLException(
++            message="syntax error",
++            sql_statement="SELECT * FROM t",
++            sql_line=3,
++            sql_col=12,
++            hint=None,
++        )
++        error = create_sql_error_from_exception(exception, MockCell())
++        assert error.sql_line == 3
++        assert error.sql_col == 12
++        assert error.sql_statement == "SELECT * FROM t"
++        assert error.hint is None
++
+     @pytest.mark.requires("duckdb")
+     def test_create_sql_error_long_statement(self, duckdb_conn):
+         """Test SQL statement truncation in error creation."""

@@ -1,0 +1,20 @@
+version = "1.0"
+
+[metadata]
+id = "marimo-easy-accept_single_digit_ports_in_is_ur_pr11410"
+repo = "marimo-team/marimo"
+commit_sha = "774844f9f98128ae6f44906d15e8ed59affe0a50"
+parent_sha = "552658c155f92e8aa2c5e70425c83f350afad536"
+committed_date = "2026-10-23T09:41:14-07:00"
+difficulty = "easy"
+category = "code"
+role = "swe"
+
+[environment]
+os = "linux"
+
+[agent]
+timeout_sec = 600
+
+[verifier]
+timeout_sec = 300

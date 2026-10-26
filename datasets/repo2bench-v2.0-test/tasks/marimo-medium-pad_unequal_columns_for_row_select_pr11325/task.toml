@@ -1,0 +1,20 @@
+version = "1.0"
+
+[metadata]
+id = "marimo-medium-pad_unequal_columns_for_row_select_pr11325"
+repo = "marimo-team/marimo"
+commit_sha = "169d793c46867adc82b66cb3596fd71772d7e33e"
+parent_sha = "e8436c827f90279cb98bad8062d8b9d36219653f"
+committed_date = "2026-10-19T12:06:13-07:00"
+difficulty = "medium"
+category = "code"
+role = "swe"
+
+[environment]
+os = "linux"
+
+[agent]
+timeout_sec = 900
+
+[verifier]
+timeout_sec = 300

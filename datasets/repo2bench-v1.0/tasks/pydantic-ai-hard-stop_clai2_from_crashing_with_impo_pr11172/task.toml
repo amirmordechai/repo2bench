@@ -1,0 +1,20 @@
+version = "1.0"
+
+[metadata]
+id = "pydantic-ai-hard-stop_clai2_from_crashing_with_impo_pr11172"
+repo = "pydantic/pydantic-ai"
+commit_sha = "5a09a0c8e943d6517a266292ef8bd8ee2253a404"
+parent_sha = "009ef62411855123236b9de474fcb0ece29e82f9"
+committed_date = "2026-10-23T18:51:28Z"
+difficulty = "hard"
+category = "code"
+role = "swe"
+
+[environment]
+os = "linux"
+
+[agent]
+timeout_sec = 1200
+
+[verifier]
+timeout_sec = 300

@@ -1,0 +1,20 @@
+version = "1.0"
+
+[metadata]
+id = "pydantic-ai-medium-accept_transport_in_create_async_h_pr11073"
+repo = "pydantic/pydantic-ai"
+commit_sha = "218e6427d7885a973ddebefd1291ffddc5ab5d93"
+parent_sha = "b02d52d361df8a60cd115e3c2704b9100ddcbf99"
+committed_date = "2026-10-23T21:20:55Z"
+difficulty = "medium"
+category = "code"
+role = "swe"
+
+[environment]
+os = "linux"
+
+[agent]
+timeout_sec = 900
+
+[verifier]
+timeout_sec = 300

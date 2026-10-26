@@ -1,0 +1,20 @@
+version = "1.0"
+
+[metadata]
+id = "marimo-hard-exclude_dml_cte_aliases_from_sql_d_pr11347"
+repo = "marimo-team/marimo"
+commit_sha = "d0b73b931fc33b796b22fb21caee29e3a545c377"
+parent_sha = "ed33ad0d9a760edd5f60ab2eb24c222cf0695dfe"
+committed_date = "2026-10-20T23:52:28+08:00"
+difficulty = "hard"
+category = "code"
+role = "swe"
+
+[environment]
+os = "linux"
+
+[agent]
+timeout_sec = 1200
+
+[verifier]
+timeout_sec = 300

@@ -1,0 +1,74 @@
+diff --git a/src/pydantic_clai2/pydantic_clai2/cli/self_update.py b/src/pydantic_clai2/pydantic_clai2/cli/self_update.py
+index 17706bd..a996e2b 100644
+--- a/src/pydantic_clai2/pydantic_clai2/cli/self_update.py
++++ b/src/pydantic_clai2/pydantic_clai2/cli/self_update.py
+@@ -327,6 +327,8 @@ class Updates:
+     """Who hears how an install goes: the shell's plugins, while one listens."""
+     capture: Callable[[], bool] = lambda: False
+     """Whether to read uv's lines for `report`, which turns uv's progress bars into plain lines: only for a page."""
++    serving: Callable[[], WebHandoff | None] = lambda: None
++    """The web UI served now, for the new `clai2` to serve again once `/update` restarts CLAI."""
+     find_uv: Callable[[], str | None] = find_uv
+     windows: bool = os.name == 'nt'
+     hand_off: Callable[[str], None] = install_after_exit
+@@ -337,6 +339,8 @@ class Updates:
+     """Set after a successful install: the running environment was replaced, so the shell exits."""
+     relaunch: str | None = None
+     """The new `clai2` to start once the shell has exited, when the install found one."""
++    web: WebHandoff | None = None
++    """The web UI for the new `clai2` to serve again, read before uv replaced the installed code."""
+     _checked: UpdateChannel | None = field(default=None, init=False)
+     _found: Update | None = field(default=None, init=False)
+ 
+@@ -399,6 +403,9 @@ class Updates:
+         # Cancelling uv halfway could leave the environment half replaced, so let it finish.
+         code: int | None = None
+         try:
++            # Read now: once uv has run, a module imported for the first time is the new build's, which may need
++            # names the old build's modules already in memory lack.
++            served = self.serving()
+             with CancelScope(shield=True):
+                 await tell('installing')
+                 code = await self.run(command, line if report is not None and self.capture() else None)
+@@ -411,6 +418,7 @@ class Updates:
+             return f'uv exited with status {code}; see its output above.'
+         self.restart_required = True
+         self.relaunch = await self.locate(uv)
++        self.web = served if self.relaunch is not None else None
+         await tell('installed' if self.relaunch is None else 'restarting')
+         if self.relaunch is None:
+             return f'Updated CLAI to {update.label} ({channel}). Exiting; start clai2 again to use it.'
+diff --git a/src/pydantic_clai2/pydantic_clai2/runtime/session_runtime.py b/src/pydantic_clai2/pydantic_clai2/runtime/session_runtime.py
+index f83b8f3..426553e 100644
+--- a/src/pydantic_clai2/pydantic_clai2/runtime/session_runtime.py
++++ b/src/pydantic_clai2/pydantic_clai2/runtime/session_runtime.py
+@@ -454,6 +454,7 @@ def create_shell(
+     updates.report = lambda: loader.fire if loader.handles(UpdateProgress) else None
+     # Only a page has no terminal to watch uv in; elsewhere uv keeps drawing its progress there.
+     updates.capture = lambda: web_serving(loader) is not None
++    updates.serving = lambda: web_serving(loader)
+     models.plugins = loader.model_providers
+     models.logins = loader.logins
+     context.plugin_models = loader.model_names
+@@ -773,7 +774,7 @@ class SessionRuntime(Generic[DepsT, OutputT]):
+ 
+     def handoff(self) -> WebHandoff | None:
+         """The web UI to serve again once `/update` restarts CLAI as this session; `None` when it does not, or none runs."""
+-        return None if self.updates.relaunch is None else web_serving(self.loader)
++        return self.updates.web
+ 
+     def relaunch(self, *, web: WebHandoff | None) -> Relaunch | None:
+         """Restart as the build `/update` installed, resuming this conversation and serving `web` again; else `None`."""
+diff --git a/src/pydantic_clai2/pydantic_clai2/ui/prompt/terminal.py b/src/pydantic_clai2/pydantic_clai2/ui/prompt/terminal.py
+index bc8d19d..48cea77 100644
+--- a/src/pydantic_clai2/pydantic_clai2/ui/prompt/terminal.py
++++ b/src/pydantic_clai2/pydantic_clai2/ui/prompt/terminal.py
+@@ -108,7 +108,7 @@ class Terminal(Generic[DepsT, OutputT]):
+     def ended(self, runtime: 'SessionRuntime[DepsT, OutputT]', reason: SessionEndReason) -> None:
+         """Note that the session shown, `runtime`, ended for `reason`, which ends `drive`.
+ 
+-        Its web UI hand-off is read now, before its plugins end: it may be the last live session.
++        Its web UI hand-off is the one `/update` read before uv replaced the installed code.
+         """
+         self.ended_in, self._reason, self.served = runtime, reason, runtime.handoff()
+         self._ended.set()

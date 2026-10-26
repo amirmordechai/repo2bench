@@ -1,0 +1,20 @@
+version = "1.0"
+
+[metadata]
+id = "pydantic-ai-easy-support_nativeoutput_on_every_fire_pr10157"
+repo = "pydantic/pydantic-ai"
+commit_sha = "ee573aca7340b00b74b3925c9132304898349d58"
+parent_sha = "5b3ede47aeaba6745733f2357bd962ed3f42bbae"
+committed_date = "2026-10-23T04:24:16Z"
+difficulty = "easy"
+category = "code"
+role = "swe"
+
+[environment]
+os = "linux"
+
+[agent]
+timeout_sec = 600
+
+[verifier]
+timeout_sec = 300

@@ -1,0 +1,6 @@
+harness_params:
+  AGY_MAX_TURNS: 80
+model_params:
+  thinking_level: medium
+  temperature: 1.0
+

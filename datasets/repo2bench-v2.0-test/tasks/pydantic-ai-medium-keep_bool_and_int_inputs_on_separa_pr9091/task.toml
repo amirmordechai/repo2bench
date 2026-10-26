@@ -1,0 +1,20 @@
+version = "1.0"
+
+[metadata]
+id = "pydantic-ai-medium-keep_bool_and_int_inputs_on_separa_pr9091"
+repo = "pydantic/pydantic-ai"
+commit_sha = "5b3ede47aeaba6745733f2357bd962ed3f42bbae"
+parent_sha = "d02b14b052d1248e0ade62378825a556ca9d77ff"
+committed_date = "2026-10-23T04:16:17Z"
+difficulty = "medium"
+category = "code"
+role = "swe"
+
+[environment]
+os = "linux"
+
+[agent]
+timeout_sec = 900
+
+[verifier]
+timeout_sec = 300

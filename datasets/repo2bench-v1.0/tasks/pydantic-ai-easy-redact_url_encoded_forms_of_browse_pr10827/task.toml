@@ -1,0 +1,20 @@
+version = "1.0"
+
+[metadata]
+id = "pydantic-ai-easy-redact_url_encoded_forms_of_browse_pr10827"
+repo = "pydantic/pydantic-ai"
+commit_sha = "d64b3453e4dcee78e6051fefc084062baf6f9beb"
+parent_sha = "490c34657c607e6ab6e13edfd4a3cf56c726abd2"
+committed_date = "2026-10-23T15:27:54Z"
+difficulty = "easy"
+category = "code"
+role = "swe"
+
+[environment]
+os = "linux"
+
+[agent]
+timeout_sec = 600
+
+[verifier]
+timeout_sec = 300

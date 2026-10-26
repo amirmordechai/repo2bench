@@ -1,0 +1,20 @@
+version = "1.0"
+
+[metadata]
+id = "pydantic-ai-hard-add_realtimeclientsecret_webrtc_ur_pr11076"
+repo = "pydantic/pydantic-ai"
+commit_sha = "3e3a6214f26c7a2b46e67e987bb997ae59a2a055"
+parent_sha = "7ad091357c7e89daaf4b0634536b038f9355df50"
+committed_date = "2026-10-23T22:22:57Z"
+difficulty = "hard"
+category = "code"
+role = "swe"
+
+[environment]
+os = "linux"
+
+[agent]
+timeout_sec = 1200
+
+[verifier]
+timeout_sec = 300

@@ -1,0 +1,20 @@
+version = "1.0"
+
+[metadata]
+id = "marimo-medium-skip_lockfile_pins_for_offline_exp_pr11104"
+repo = "marimo-team/marimo"
+commit_sha = "f4f28449a97552791311c488a87341b6112f15aa"
+parent_sha = "b720175a3b440463381307a7271bb0e735fbd187"
+committed_date = "2026-10-05T15:33:13+02:00"
+difficulty = "medium"
+category = "code"
+role = "swe"
+
+[environment]
+os = "linux"
+
+[agent]
+timeout_sec = 900
+
+[verifier]
+timeout_sec = 300

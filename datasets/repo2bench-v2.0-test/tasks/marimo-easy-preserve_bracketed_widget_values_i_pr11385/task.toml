@@ -1,0 +1,20 @@
+version = "1.0"
+
+[metadata]
+id = "marimo-easy-preserve_bracketed_widget_values_i_pr11385"
+repo = "marimo-team/marimo"
+commit_sha = "c716635c09495d1deaf64a3cef1c54756975d430"
+parent_sha = "b5e7e073c0680031d883c5472bb8ebaa96140953"
+committed_date = "2026-10-22T12:58:58-04:00"
+difficulty = "easy"
+category = "code"
+role = "swe"
+
+[environment]
+os = "linux"
+
+[agent]
+timeout_sec = 600
+
+[verifier]
+timeout_sec = 300

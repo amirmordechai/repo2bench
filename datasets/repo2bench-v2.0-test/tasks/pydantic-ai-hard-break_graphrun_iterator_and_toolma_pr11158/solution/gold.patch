@@ -1,0 +1,62 @@
+diff --git a/pydantic_ai_slim/pydantic_ai/agent/__init__.py b/pydantic_ai_slim/pydantic_ai/agent/__init__.py
+index 412b408..f45ba29 100644
+--- a/pydantic_ai_slim/pydantic_ai/agent/__init__.py
++++ b/pydantic_ai_slim/pydantic_ai/agent/__init__.py
+@@ -4868,6 +4868,7 @@ class _PreparedAgentRun(Generic[_PreparedDepsT, _PreparedOutputT]):
+         async with AsyncExitStack() as stack:
+             # Enter first so cancellation is classified only after every other context has torn down.
+             await stack.enter_async_context(_translate_cancellation())
++            stack.callback(lambda: graph_deps.tool_manager._release_context())  # pyright: ignore[reportPrivateUsage]
+             stack.callback(refresh_workspace_ref)
+             # This run's usage is credited to no span until one of its own is opened (by
+             # `Instrumentation.wrap_run`), so an uninstrumented run started from inside an
+diff --git a/pydantic_ai_slim/pydantic_ai/tool_manager.py b/pydantic_ai_slim/pydantic_ai/tool_manager.py
+index 744f027..2e5ec50 100644
+--- a/pydantic_ai_slim/pydantic_ai/tool_manager.py
++++ b/pydantic_ai_slim/pydantic_ai/tool_manager.py
+@@ -474,8 +474,14 @@ class ToolManager(Generic[AgentDepsT]):
+         # the one the step's instructions are rendered with, and `ctx` is a copy from the second step on.
+         ctx.tool_manager = new_tm
+         caller_ctx.tool_manager = new_tm
++        self._release_context()
+         return new_tm
+ 
++    def _release_context(self) -> None:
++        if self.ctx is not None and self.ctx.tool_manager is self:
++            # Keep contexts retained by tools or hooks intact while breaking the manager's cycle.
++            self.ctx = replace(self.ctx, tool_manager=None)
++
+     @property
+     def tool_defs(self) -> list[ToolDefinition]:
+         """The tool definitions for the tools in this tool manager."""
+diff --git a/pydantic_graph/pydantic_graph/graph_builder.py b/pydantic_graph/pydantic_graph/graph_builder.py
+index 73c8d27..6aa1009 100644
+--- a/pydantic_graph/pydantic_graph/graph_builder.py
++++ b/pydantic_graph/pydantic_graph/graph_builder.py
+@@ -477,7 +477,7 @@ class GraphRun(Generic[StateT, DepsT, OutputT]):
+             node_id=StartNode.id, inputs=inputs, fork_stack=initial_fork_stack, task_id=self._get_next_task_id()
+         )
+         self._iterator_task_group = create_task_group()
+-        self._iterator_instance = _GraphIterator[StateT, DepsT, OutputT](
++        self._iterator_instance: _GraphIterator[StateT, DepsT, OutputT] | None = _GraphIterator(
+             self.graph,
+             self.state,
+             self.deps,
+@@ -497,10 +497,15 @@ class GraphRun(Generic[StateT, DepsT, OutputT]):
+         return self
+ 
+     async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any):
+-        await self._async_exit_stack.__aexit__(exc_type, exc_val, exc_tb)
++        try:
++            await self._async_exit_stack.__aexit__(exc_type, exc_val, exc_tb)
++        finally:
++            # Iterator callbacks refer back to this run; release them after its tasks finish.
++            self._iterator_instance = None
+ 
+     @asynccontextmanager
+-    async def _iterator_context(self):
++    async def _iterator_context(self) -> AsyncGenerator[None]:
++        assert self._iterator_instance is not None
+         try:
+             yield
+         finally:

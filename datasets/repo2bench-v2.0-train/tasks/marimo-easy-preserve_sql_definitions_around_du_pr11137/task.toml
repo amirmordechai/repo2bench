@@ -1,0 +1,20 @@
+version = "1.0"
+
+[metadata]
+id = "marimo-easy-preserve_sql_definitions_around_du_pr11137"
+repo = "marimo-team/marimo"
+commit_sha = "ca6dd42d6f961a415159500985507fcdcd5d8ee1"
+parent_sha = "a5d03aa6fbc5cbc2169df2cb32d40f983d8d5214"
+committed_date = "2026-10-08T13:34:27+08:00"
+difficulty = "easy"
+category = "code"
+role = "swe"
+
+[environment]
+os = "linux"
+
+[agent]
+timeout_sec = 600
+
+[verifier]
+timeout_sec = 300

@@ -1,0 +1,55 @@
+diff --git a/marimo/_config/settings.py b/marimo/_config/settings.py
+index 4e6c1a237..2711ff194 100644
+--- a/marimo/_config/settings.py
++++ b/marimo/_config/settings.py
+@@ -15,6 +15,8 @@ class GlobalSettings:
+     YES: bool = False
+     CHECK_STATUS_UPDATE: bool = False
+     TRACING: bool = is_env_true("MARIMO_TRACING")
++    # Temporary opt-in while the host protocol is experimental.
++    ENABLE_HOST: bool = is_env_true("MARIMO_ENABLE_HOST")
+     PROFILE_DIR: str | None = None
+     LOG_LEVEL: int = logging.WARNING
+     MANAGE_SCRIPT_METADATA: bool = is_env_true("MARIMO_MANAGE_SCRIPT_METADATA")
+diff --git a/marimo/_server/host/lifespan.py b/marimo/_server/host/lifespan.py
+index 93ad3cf93..8af1b900e 100644
+--- a/marimo/_server/host/lifespan.py
++++ b/marimo/_server/host/lifespan.py
+@@ -9,6 +9,7 @@ import secrets
+ from typing import TYPE_CHECKING
+ 
+ from marimo import _loggers
++from marimo._config.settings import GLOBAL_SETTINGS
+ from marimo._server.api.deps import AppStateBase
+ from marimo._server.host.bridge import SessionBridge
+ from marimo._server.host.context import HostContext
+@@ -27,7 +28,7 @@ LOGGER = _loggers.marimo_logger()
+ async def host(app: Starlette) -> AsyncIterator[None]:
+     """Initialize the host API and discovery record in edit mode."""
+     state = AppStateBase.from_app(app)
+-    if state.mode is not SessionMode.EDIT:
++    if not GLOBAL_SETTINGS.ENABLE_HOST or state.mode is not SessionMode.EDIT:
+         yield
+         return
+ 
+diff --git a/marimo/_server/main.py b/marimo/_server/main.py
+index ac98876be..c3e8b99d1 100644
+--- a/marimo/_server/main.py
++++ b/marimo/_server/main.py
+@@ -60,10 +60,12 @@ def create_starlette_app(
+     skew_protection: bool = True,
+     timeout: float | None = None,
+ ) -> Starlette:
+-    # Handle host API requests first to bypass the editor's middleware.
+-    final_middlewares: list[Middleware] = [
+-        Middleware(HostApiMiddleware, base_url=base_url)
+-    ]
++    final_middlewares: list[Middleware] = []
++    if GLOBAL_SETTINGS.ENABLE_HOST:
++        # Handle host API requests first to bypass the editor's middleware.
++        final_middlewares.append(
++            Middleware(HostApiMiddleware, base_url=base_url)
++        )
+ 
+     if allow_origins is None:
+         allow_origins = ("localhost", "127.0.0.1") + (

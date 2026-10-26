@@ -1,0 +1,20 @@
+version = "1.0"
+
+[metadata]
+id = "pydantic-ai-hard-break_graphrun_iterator_and_toolma_pr11158"
+repo = "pydantic/pydantic-ai"
+commit_sha = "e5d08153dfb6eac9c8ac3bf45b20d0f1054b73b0"
+parent_sha = "e3aba7adf6b9e4b952fc664c4ba9ae5ef1858a38"
+committed_date = "2026-10-24T16:07:48Z"
+difficulty = "hard"
+category = "code"
+role = "swe"
+
+[environment]
+os = "linux"
+
+[agent]
+timeout_sec = 1200
+
+[verifier]
+timeout_sec = 300

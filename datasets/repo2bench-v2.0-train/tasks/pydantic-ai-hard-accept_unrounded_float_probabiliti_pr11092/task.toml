@@ -1,0 +1,20 @@
+version = "1.0"
+
+[metadata]
+id = "pydantic-ai-hard-accept_unrounded_float_probabiliti_pr11092"
+repo = "pydantic/pydantic-ai"
+commit_sha = "3491aaa4016d39b64b8628c8c60f0106ab118fb6"
+parent_sha = "c9fd08b19aa964f28c92f03444866d4cca9fe0ce"
+committed_date = "2026-10-22T23:43:05Z"
+difficulty = "hard"
+category = "code"
+role = "swe"
+
+[environment]
+os = "linux"
+
+[agent]
+timeout_sec = 1200
+
+[verifier]
+timeout_sec = 300

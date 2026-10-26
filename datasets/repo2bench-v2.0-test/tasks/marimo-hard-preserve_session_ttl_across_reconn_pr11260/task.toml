@@ -1,0 +1,20 @@
+version = "1.0"
+
+[metadata]
+id = "marimo-hard-preserve_session_ttl_across_reconn_pr11260"
+repo = "marimo-team/marimo"
+commit_sha = "80c9144ceaa69968c50639cce659b1c4dc664f21"
+parent_sha = "f1358c39e0f3348773238713a58292cc8ca24400"
+committed_date = "2026-10-21T18:21:46Z"
+difficulty = "hard"
+category = "code"
+role = "swe"
+
+[environment]
+os = "linux"
+
+[agent]
+timeout_sec = 1200
+
+[verifier]
+timeout_sec = 300

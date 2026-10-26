@@ -1,0 +1,20 @@
+version = "1.0"
+
+[metadata]
+id = "pydantic-ai-easy-stop_sending_a_thinking_config_to_pr11099"
+repo = "pydantic/pydantic-ai"
+commit_sha = "ca7dc6c49bba642a69acf8459860e07072ab81b4"
+parent_sha = "2a6c0318e85ed76ab0701506ca22f6be2ed8fe59"
+committed_date = "2026-10-23T20:46:17Z"
+difficulty = "easy"
+category = "code"
+role = "swe"
+
+[environment]
+os = "linux"
+
+[agent]
+timeout_sec = 600
+
+[verifier]
+timeout_sec = 300

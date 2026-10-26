@@ -1,0 +1,50 @@
+diff --git a/src/pydantic_ai_harness/pydantic_ai_harness/step_persistence/_messages.py b/src/pydantic_ai_harness/pydantic_ai_harness/step_persistence/_messages.py
+index 47d921a77..d5e3ee7e1 100644
+--- a/src/pydantic_ai_harness/pydantic_ai_harness/step_persistence/_messages.py
++++ b/src/pydantic_ai_harness/pydantic_ai_harness/step_persistence/_messages.py
+@@ -13,7 +13,7 @@ def keyed_messages(messages: list[object]) -> list[tuple[str, str]]:
+     """Each message's SHA-256 and the JSON it hashes, in history order."""
+     keyed: list[tuple[str, str]] = []
+     for message in messages:
+-        text = json.dumps(message, sort_keys=True, separators=(',', ':'))
++        text = json.dumps(message, separators=(',', ':'))
+         keyed.append((hashlib.sha256(text.encode()).hexdigest(), text))
+     return keyed
+ 
+diff --git a/tests/harness/step_persistence/_histories.py b/tests/harness/step_persistence/_histories.py
+index ba4367575..1091e3b67 100644
+--- a/tests/harness/step_persistence/_histories.py
++++ b/tests/harness/step_persistence/_histories.py
+@@ -2,7 +2,15 @@
+ 
+ from __future__ import annotations
+ 
+-from pydantic_ai.messages import ModelMessage, ModelRequest, ModelResponse, TextPart, UserPromptPart
++from pydantic_ai.messages import (
++    ModelMessage,
++    ModelRequest,
++    ModelResponse,
++    TextPart,
++    ToolCallPart,
++    ToolReturnPart,
++    UserPromptPart,
++)
+ 
+ 
+ def growing_histories(turns: int) -> list[list[ModelMessage]]:
+@@ -17,3 +25,15 @@ def growing_histories(turns: int) -> list[list[ModelMessage]]:
+         ]
+         histories.append(history)
+     return histories
++
++
++def history_with_unordered_keys() -> list[ModelMessage]:
++    """A tool call, its return and provider details whose dict keys aren't in sorted order."""
++    return [
++        ModelRequest(parts=[UserPromptPart(content='find shoes')]),
++        ModelResponse(
++            parts=[ToolCallPart('search', {'query': 'shoes', 'filters': {'zip': '10115', 'brand': 'x'}, 'limit': 5})],
++            provider_details={'service_tier': 'default', 'finish_reason': 'tool_calls'},
++        ),
++        ModelRequest(parts=[ToolReturnPart('search', {'total': 1, 'items': [{'title': 'shoe', 'id': 7}]})]),
++    ]

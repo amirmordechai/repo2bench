@@ -1,0 +1,20 @@
+version = "1.0"
+
+[metadata]
+id = "marimo-hard-handle_utf_8_byte_offsets_in_sql_d_pr11187"
+repo = "marimo-team/marimo"
+commit_sha = "9c37a417b95be6da9fe625443297b845ff2f19fe"
+parent_sha = "060703cd4f53ee66b7882bcf57e10da51ddd670c"
+committed_date = "2026-10-12T12:13:12-07:00"
+difficulty = "hard"
+category = "code"
+role = "swe"
+
+[environment]
+os = "linux"
+
+[agent]
+timeout_sec = 1200
+
+[verifier]
+timeout_sec = 300

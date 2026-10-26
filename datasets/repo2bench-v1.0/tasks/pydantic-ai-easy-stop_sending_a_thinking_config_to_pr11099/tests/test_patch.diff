@@ -1,0 +1,90 @@
+diff --git a/tests/models/google/test_image_generation.py b/tests/models/google/test_image_generation.py
+index 4493be13a..5c6234d35 100644
+--- a/tests/models/google/test_image_generation.py
++++ b/tests/models/google/test_image_generation.py
+@@ -391,6 +391,19 @@ async def test_google_image_or_text_output(allow_model_requests: None, gemini_ap
+     assert result.output == snapshot(IsInstance(BinaryImage))
+ 
+ 
++async def test_google_2_5_flash_image_ignores_thinking(
++    allow_model_requests: None, gemini_api_key: str, request_capture: RequestCapture
++):
++    """`gemini-2.5-flash-image` doesn't think, so unified `thinking` sends no thinking config, which the API would reject."""
++    provider = GoogleProvider(api_key=gemini_api_key, http_client=request_capture.http_client(timeout=30))
++    agent = Agent(GoogleModel('gemini-2.5-flash-image', provider=provider), model_settings={'thinking': True})
++
++    result = await agent.run('Say hi in one word, no image please.')
++    assert result.output == snapshot('Hi!')
++    body = request_capture.body(':generateContent')
++    assert body['generationConfig'] == snapshot({'responseModalities': ['TEXT', 'IMAGE']})
++
++
+ async def test_google_image_and_text_output(allow_model_requests: None, gemini_api_key: str):
+     m = GoogleModel('gemini-2.5-flash-image', provider=GoogleProvider(api_key=gemini_api_key))
+     agent = Agent(m)
+diff --git a/tests/profiles/test_google.py b/tests/profiles/test_google.py
+index 902e3a38f..2a658feda 100644
+--- a/tests/profiles/test_google.py
++++ b/tests/profiles/test_google.py
+@@ -252,7 +252,7 @@ def test_model_profile_thinking_defaults():
+         assert profile.get('google_supports_thinking_level') is True, f'{name} should support thinking_level'
+ 
+     # Gemini 2.5: supports thinking, but uses budget (thinking_level=False)
+-    for name in ('gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.5-flash-image'):
++    for name in ('gemini-2.5-flash', 'gemini-2.5-pro'):
+         profile = google_model_profile(name)
+         assert profile is not None, f'{name} should have a profile'
+         assert profile.get('supports_thinking') is True, f'{name} should support thinking'
+@@ -266,6 +266,8 @@ def test_model_profile_thinking_defaults():
+         'gemini-1.5-pro',
+         'gemini-pro',
+         'gemma-3-27b-it',
++        # The Gemini API and Vertex both reject a thinking config for this 2.5 image model.
++        'gemini-2.5-flash-image',
+     ):
+         profile = google_model_profile(name)
+         assert profile is not None, f'{name} should have a profile'
+diff --git a/tests/profiles/test_resolution_matrix.py b/tests/profiles/test_resolution_matrix.py
+index a70df0d66..ad36b0c6c 100644
+--- a/tests/profiles/test_resolution_matrix.py
++++ b/tests/profiles/test_resolution_matrix.py
+@@ -717,26 +717,33 @@ def test_google_gemini_2_5_flash():
+ 
+ @pytest.mark.skipif(not google_imports(), reason='google not installed')
+ def test_google_gemini_2_5_flash_image():
+-    # `gemini-2.5-flash-image` is both a thinking (2.5) and an image model, so the `not is_image_model`
+-    # term in the profile's strict-support guard is load-bearing: it flips the flag from True back to
+-    # False. The explicit assert (not just the snapshot, which strips the default `False`) guards against
+-    # a silent inversion of that guard, which 100% line coverage would otherwise hide.
++    # Unlike the other 2.5 models, `gemini-2.5-flash-image` doesn't think: both APIs reject a thinking config.
+     profile = GoogleProvider.model_profile('gemini-2.5-flash-image')
+     assert profile is not None
+-    assert profile.get('google_supports_strict_tool_definition') is False
++    assert profile.get('supports_thinking') is False
+     assert _normalize(profile) == snapshot(
+         {
+             'json_schema_transformer': GoogleJsonSchemaTransformer,
+             'supports_image_output': True,
+             'supports_tools': False,
+             'supports_video_input': False,
+-            'supports_thinking': True,
+             'google_supports_thinking_level': False,
+             'google_web_search_billed_per_prompt': True,
+         }
+     )
+ 
+ 
++@pytest.mark.skipif(not google_imports(), reason='google not installed')
++def test_google_gemini_3_pro_image_strict_tool_definition():
++    # `gemini-3-pro-image` is both a thinking and an image model, so the `not is_image_model` term in the
++    # profile's strict-support guard is load-bearing: it flips the flag from True back to False. The
++    # explicit assert (a snapshot would strip the default `False`) guards against a silent inversion.
++    profile = GoogleProvider.model_profile('gemini-3-pro-image')
++    assert profile is not None
++    assert profile.get('supports_thinking') is True
++    assert profile.get('google_supports_strict_tool_definition') is False
++
++
+ @pytest.mark.skipif(not google_imports(), reason='google not installed')
+ def test_google_gemini_3_7_flash_thinking_levels():
+     # The level set must survive the provider `model_profile()` path, not just `google_model_profile()`.

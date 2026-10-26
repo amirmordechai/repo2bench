@@ -1,0 +1,20 @@
+version = "1.0"
+
+[metadata]
+id = "pydantic-ai-medium-make_e2bsandbox_raise_a_clear_user_pr10810"
+repo = "pydantic/pydantic-ai"
+commit_sha = "a500320d573354ce7bd5224a282b1090cb70cc54"
+parent_sha = "8dbb56d318dd45d990b9edac3046a330145f66e7"
+committed_date = "2026-10-23T00:49:26Z"
+difficulty = "medium"
+category = "code"
+role = "swe"
+
+[environment]
+os = "linux"
+
+[agent]
+timeout_sec = 900
+
+[verifier]
+timeout_sec = 300

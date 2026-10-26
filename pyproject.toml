@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "repo2bench"
+version = "0.1.0"
+description = "Turn any Git repository's commit & PR history into verified Harbor coding agent benchmark tasks."
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.11"
+authors = [
+  { name = "Amir Davidoff" }
+]
+dependencies = [
+  "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+]
+
+[project.scripts]
+repo2bench = "repo2bench.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+

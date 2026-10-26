@@ -1,0 +1,58 @@
+diff --git a/pydantic_ai_slim/pydantic_ai/realtime/_openai_webrtc.py b/pydantic_ai_slim/pydantic_ai/realtime/_openai_webrtc.py
+index 197d9d462..2dc0c1e64 100644
+--- a/pydantic_ai_slim/pydantic_ai/realtime/_openai_webrtc.py
++++ b/pydantic_ai_slim/pydantic_ai/realtime/_openai_webrtc.py
+@@ -121,8 +121,12 @@ async def mint_client_secret(
+     model_name: str,
+     session_config: dict[str, Any],
+     expires_after_seconds: int | None,
++    webrtc_url: str | None,
+ ) -> RealtimeClientSecret:
+-    """`POST .../realtime/client_secrets` to mint an ephemeral browser token bound to `session_config`."""
++    """`POST .../realtime/client_secrets` to mint an ephemeral browser token bound to `session_config`.
++
++    `webrtc_url` is where a browser posts its WebRTC offer with the token, if the provider takes one.
++    """
+     payload: dict[str, Any] = {'session': session_config}
+     if expires_after_seconds is not None:
+         payload['expires_after'] = {'anchor': 'created_at', 'seconds': expires_after_seconds}
+@@ -148,6 +152,7 @@ async def mint_client_secret(
+     return RealtimeClientSecret(
+         value=data.value,
+         expires_at=expires_at,
++        webrtc_url=webrtc_url,
+         provider_details=provider_details or None,
+     )
+ 
+diff --git a/pydantic_ai_slim/pydantic_ai/realtime/model.py b/pydantic_ai_slim/pydantic_ai/realtime/model.py
+index 00162c4bd..68c6ff3c2 100644
+--- a/pydantic_ai_slim/pydantic_ai/realtime/model.py
++++ b/pydantic_ai_slim/pydantic_ai/realtime/model.py
+@@ -137,6 +137,14 @@ class RealtimeClientSecret:
+     _: KW_ONLY
+     expires_at: datetime
+     """When the secret expires (timezone-aware UTC)."""
++    webrtc_url: str | None = None
++    """Where the browser posts its WebRTC SDP offer, with the secret as its bearer token.
++
++    The answer comes back as the response body, and the call's id in its `Location` header. On Azure OpenAI the
++    URL carries `webrtcfilter=on`, so the browser's data channel gets only the events that are safe for it to see,
++    as on a call answered with [`answer_webrtc_offer`][pydantic_ai.realtime.RealtimeModel.answer_webrtc_offer].
++    `None` when the provider takes no WebRTC offers.
++    """
+     provider_details: dict[str, Any] | None = field(default=None, repr=False)
+     """Raw provider fields returned alongside the secret (e.g. the resolved `session` object).
+ 
+diff --git a/pydantic_ai_slim/pydantic_ai/realtime/openai.py b/pydantic_ai_slim/pydantic_ai/realtime/openai.py
+index e890b5f80..1221726ee 100644
+--- a/pydantic_ai_slim/pydantic_ai/realtime/openai.py
++++ b/pydantic_ai_slim/pydantic_ai/realtime/openai.py
+@@ -1692,6 +1692,8 @@ class OpenAIRealtimeModel(RealtimeModel):
+             model_name=self.model_name,
+             session_config=self._webrtc_session_config(instructions, tools, model_settings),
+             expires_after_seconds=expires_after_seconds,
++            # The same endpoint `answer_webrtc_offer` relays to, with the same query (Azure's `webrtcfilter=on`).
++            webrtc_url=self._webrtc_calls_url() if self.profile.get('supports_webrtc') else None,
+         )
+ 
+     async def answer_webrtc_offer(

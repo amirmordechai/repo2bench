@@ -1,0 +1,20 @@
+version = "1.0"
+
+[metadata]
+id = "pydantic-ai-medium-deprecate_google_multi_speaker_on_pr11064"
+repo = "pydantic/pydantic-ai"
+commit_sha = "2116207255c13f27b415306567bb2d25d0c99374"
+parent_sha = "1ce05aa26bb08b624938bc2df0d3ea81da72854a"
+committed_date = "2026-10-23T22:21:54Z"
+difficulty = "medium"
+category = "code"
+role = "swe"
+
+[environment]
+os = "linux"
+
+[agent]
+timeout_sec = 900
+
+[verifier]
+timeout_sec = 300

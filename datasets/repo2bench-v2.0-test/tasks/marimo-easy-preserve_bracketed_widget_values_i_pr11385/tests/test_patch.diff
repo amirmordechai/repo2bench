@@ -1,0 +1,105 @@
+diff --git a/tests/_output/formatters/test_formatters.py b/tests/_output/formatters/test_formatters.py
+index c53a594..bdda3c5 100644
+--- a/tests/_output/formatters/test_formatters.py
++++ b/tests/_output/formatters/test_formatters.py
+@@ -707,7 +707,7 @@ def test_as_html_basic_types() -> None:
+     result = as_html([1, 2, 3])
+     assert (
+         result.text
+-        == "<marimo-json-output data-json-data='[1,2,3]' data-value-types='&quot;python&quot;'></marimo-json-output>"
++        == "<marimo-json-output data-json-data='&#91;1,2,3&#93;' data-value-types='&quot;python&quot;'></marimo-json-output>"
+     )
+ 
+     # Dict
+@@ -833,7 +833,7 @@ def test_as_html_with_plain_wrapper() -> None:
+     result = as_html(plain_list)
+     assert (
+         result.text
+-        == "<marimo-json-output data-json-data='[1,2,3]' data-value-types='&quot;python&quot;'></marimo-json-output>"
++        == "<marimo-json-output data-json-data='&#91;1,2,3&#93;' data-value-types='&quot;python&quot;'></marimo-json-output>"
+     )
+ 
+     # Test with a dict that would normally get marimo-json formatting
+diff --git a/tests/_plugins/core/test_web_component.py b/tests/_plugins/core/test_web_component.py
+index 60b6eac..2678ddf 100644
+--- a/tests/_plugins/core/test_web_component.py
++++ b/tests/_plugins/core/test_web_component.py
+@@ -3,6 +3,9 @@ from __future__ import annotations
+ 
+ import re
+ 
++import pytest
++
++import marimo as mo
+ from marimo._output.formatting import as_html
+ from marimo._output.md import md
+ from marimo._plugins.core.web_component import (
+@@ -51,6 +54,22 @@ def test_embed_dollar_sign_in_md() -> None:
+     assert "arithmatex" not in markdown.text
+ 
+ 
++@pytest.mark.parametrize(
++    "value",
++    [
++        "C[A](C)",
++        "[link](https://example.com)",
++        "![alt](image.png)",
++        "[a][b]",
++    ],
++)
++def test_embed_markdown_link_in_md(value: str) -> None:
++    element = mo.ui.text(value=value, label="**Smile String** :")
++    rendered = md(f"{element}\n\n[b]: https://example.com")
++
++    assert parse_initial_value(rendered.text) == value
++
++
+ # DOMPurify's SAFE_FOR_XML rule strips any attribute whose value matches
+ # `]>`, `-->`, `--!>`, or `</(style|script|title|xmp|textarea|noscript|iframe
+ # |noembed|noframes)`. `_build_attr` must emit JSON-escaped `<`/`>` so the
+diff --git a/tests/_plugins/stateless/test_accordion.py b/tests/_plugins/stateless/test_accordion.py
+index ea44748..68d583c 100644
+--- a/tests/_plugins/stateless/test_accordion.py
++++ b/tests/_plugins/stateless/test_accordion.py
+@@ -103,12 +103,16 @@ def test_accordion_expanded(
+ @pytest.mark.parametrize("multiple", [False, True])
+ def test_empty_accordion_expanded(multiple: bool) -> None:
+     result = accordion({}, multiple=multiple, expanded=True)
+-    assert "data-expanded='[]'" in result.text
++    match = re.search("data-expanded='(.*?)'", result.text)
++    assert match is not None
++    assert json.loads(html.unescape(match[1])) == []
+ 
+ 
+ def test_accordion_default_collapsed() -> None:
+     result = accordion({"Summary": "Overview"})
+-    assert "data-expanded='[]'" in result.text
++    match = re.search("data-expanded='(.*?)'", result.text)
++    assert match is not None
++    assert json.loads(html.unescape(match[1])) == []
+ 
+ 
+ @pytest.mark.parametrize("multiple", [False, True])
+diff --git a/tests/_plugins/stateless/test_routes.py b/tests/_plugins/stateless/test_routes.py
+index b37149b..624926b 100644
+--- a/tests/_plugins/stateless/test_routes.py
++++ b/tests/_plugins/stateless/test_routes.py
+@@ -1,6 +1,10 @@
+ # Copyright 2026 Marimo. All rights reserved.
+ from __future__ import annotations
+ 
++import html
++import json
++import re
++
+ from marimo._runtime.context import get_context
+ from marimo._runtime.context.types import RuntimeContext
+ from marimo._runtime.runtime import Kernel
+@@ -74,4 +78,6 @@ async def test_routes_non_lazy(k: Kernel, exec_req: ExecReqProvider) -> None:
+     routes = k.globals["routes"]
+     children = "<span>42</span><span>45</span>"
+     assert children in routes.text
+-    assert "data-routes='[&quot;#/&quot;,&quot;{/*path}&quot;]'" in routes.text
++    match = re.search("data-routes='(.*?)'", routes.text)
++    assert match is not None
++    assert json.loads(html.unescape(match[1])) == ["#/", "{/*path}"]

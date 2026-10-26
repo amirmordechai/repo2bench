@@ -1,0 +1,13 @@
+diff --git a/pydantic_ai_slim/pydantic_ai/agent/abstract.py b/pydantic_ai_slim/pydantic_ai/agent/abstract.py
+index acc18d6c7..77abfa181 100644
+--- a/pydantic_ai_slim/pydantic_ai/agent/abstract.py
++++ b/pydantic_ai_slim/pydantic_ai/agent/abstract.py
+@@ -1023,6 +1023,8 @@ class AbstractAgent(Generic[AgentDepsT, OutputDataT], ABC):
+             # f_back because `asynccontextmanager` adds one frame
+             if frame := inspect.currentframe():  # pragma: no branch
+                 self._infer_name(frame.f_back)
++            # This generator's frame would otherwise refer to itself and keep `deps` alive until garbage collection.
++            del frame
+ 
+         event_stream_handler = event_stream_handler or self.event_stream_handler
+ 

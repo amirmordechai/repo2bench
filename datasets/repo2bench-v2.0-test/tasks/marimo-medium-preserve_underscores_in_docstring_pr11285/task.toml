@@ -1,0 +1,20 @@
+version = "1.0"
+
+[metadata]
+id = "marimo-medium-preserve_underscores_in_docstring_pr11285"
+repo = "marimo-team/marimo"
+commit_sha = "5e8e83e4d9ce4780255581d10c49f10a7a680e69"
+parent_sha = "dcc892e99c8219b26dc75678f8a6798a51a9bd21"
+committed_date = "2026-10-16T13:23:19-07:00"
+difficulty = "medium"
+category = "code"
+role = "swe"
+
+[environment]
+os = "linux"
+
+[agent]
+timeout_sec = 900
+
+[verifier]
+timeout_sec = 300

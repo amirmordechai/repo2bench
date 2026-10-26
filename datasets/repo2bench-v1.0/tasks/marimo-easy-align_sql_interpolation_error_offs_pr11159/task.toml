@@ -1,0 +1,20 @@
+version = "1.0"
+
+[metadata]
+id = "marimo-easy-align_sql_interpolation_error_offs_pr11159"
+repo = "marimo-team/marimo"
+commit_sha = "c15169deec9e58d6925351030f00a260457a16b8"
+parent_sha = "40c8acde850b699b683ce55049bc6e6e0eebbce7"
+committed_date = "2026-10-13T08:27:46-07:00"
+difficulty = "easy"
+category = "code"
+role = "swe"
+
+[environment]
+os = "linux"
+
+[agent]
+timeout_sec = 600
+
+[verifier]
+timeout_sec = 300
