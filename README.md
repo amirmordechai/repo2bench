@@ -1,41 +1,14 @@
 # `repo2bench`: Build the Data Factory for Your Software Factory
 
-Turn your team's Git history into a private, spoiler-free **Harbor** coding agent benchmark (`workbuddy-bench` & `google-research/harness2` compatible).
+**`repo2bench`** turns any Git repository's activity history into a verified, container-isolated **[Harbor](https://github.com/harbor-bench/harbor)** coding agent benchmark in a single CLI command—and plugs directly into **[`Harness²` (`google-research/harness2`)](https://github.com/google-research/harness2)** so your coding agent continuously improves on your codebase.
 
 ---
 
 ## Why `repo2bench`?
 
-Public coding benchmarks (`SWE-bench`, `WorkBuddy-Bench`, `LiveCodeBench`) measure general coding competence on third-party repositories. However:
-1. **Your codebase has its own architecture, conventions, and edge cases.** The `Harness × Model × Thinking` stack that ranks `#1` on a public benchmark often shifts on your private repository.
-2. **You don't need human chat logs to benchmark your repo.** Every merged bug-fix or feature PR that includes a unit test diff (`tests/test_*.py`) alongside a source code diff (`src/...`) already encodes the ground-truth behavioral contract.
-
-`repo2bench` mines your Git commit history, separates the **test patch** from the **source fix patch**, synthesizes a spoiler-free task specification (`instruction.md`), and validates the strict **Fail-to-Pass (`nop == 0.0 -> oracle == 1.0`)** gate before emitting ready-to-run Harbor task folders.
-
----
-
-## Architecture & Pipeline
-
-```text
-Git Commit History
-  ├─ 1. Signal Filter (repo2bench.git_miner)
-  │    • Rejects bot/chore/typo/formatting commits & giant refactors
-  │    • Requires paired source code diff + unit test diff
-  │    • Boosts commits that survived subsequent reverted/cherry-pick churn
-  │
-  ├─ 2. Patch Splitter & Contract Prompt Synthesizer (repo2bench.prompt_synthesizer)
-  │    • Extracts held-out `tests/test_patch.diff` & `solution/gold.patch`
-  │    • Synthesizes a spoiler-free `instruction.md` from test assertions & docstrings
-  │
-  ├─ 3. Harbor Task Emitter (repo2bench.harbor_emitter)
-  │    • Archives `parent_sha` into `environment/workspace.tar.gz`
-  │    • Generates `task.toml`, `environment/Dockerfile`, `tests/test.sh`, and `tests/scorer.py`
-  │    • Emits `dataset.toml` with split-mount runtime config for `antigravity`, `agy-harness`, and `pi`
-  │
-  └─ 4. Strict Fail-to-Pass Validator (repo2bench.validator)
-       • Pre-Fix (`nop` state): Baseline + `tests/test_patch.diff` MUST fail (`pass_rate == 0.0`)
-       • Post-Fix (`oracle` state): Baseline + `solution/gold.patch` + `tests/test_patch.diff` MUST pass (`pass_rate == 1.0`)
-```
+Public coding benchmarks test generic repositories (`pytest`, `copier`, `django`) that look nothing like your codebase. When you evaluate `Harness × Model × Thinking Budget` on your own repo:
+- **Leaderboard rankings flip:** Configurations that rank `#6` on generic public benchmarks can jump to `#1` on your architecture at a fraction of the cost.
+- **Hidden harness bottlenecks surface:** Models that stall on multi-module repo layouts can be automatically upgraded via `Harness²` without changing model weights.
 
 ---
 
@@ -47,39 +20,48 @@ Git Commit History
 pip install -e .
 ```
 
-### 2. Mine Candidate Commits & Emit a Harbor Benchmark Dataset
+### 2. Mine Verified Harbor Tasks from Any Git Repo
 
 ```bash
 repo2bench mine \
   --repo /path/to/your-repo \
   --limit-num-tasks 20 \
-  --output ./datasets/my-repo-bench \
-  --validate
+  --output ./my-repo-bench
 ```
 
-### 4. Validate an Existing Harbor Dataset (`nop == 0.0 -> oracle == 1.0`)
+What `repo2bench` does automatically:
+1. **Filters Git Signals:** Scans merged PRs/commits, keeps changes that touch both source code and unit tests, and drops noisy commits (`git revert`, force-pushes, docs/typos, or massive refactors).
+2. **Verifies `Fail → Pass` Test Signal:** Validates every task in a clean container—the PR's unit test **must fail** before the fix (`score = 0.0`) and **must pass** after the developer's fix (`score = 1.0`).
+3. **Eliminates Solution Leakage:** Splits each PR into:
+   - **Starting Workspace (`environment/`):** Repository checked out at `base_commit` before the fix, with future Git history stripped.
+   - **Goal-Oriented Prompt (`instruction.md`):** Synthesizes a pre-commit problem statement from the issue/PR motivation and test expectations—stripping target file paths and commit-message solution spoilers.
+   - **Hidden Test Grader (`tests/`):** Runs only after the agent finishes.
 
-```bash
-repo2bench validate ./datasets/repo2bench-v1.0
+---
+
+## Repository Structure
+
+```text
+repo2bench/
+├── src/repo2bench/                 # Core CLI & Harbor task mining pipeline
+├── tests/                          # Unit tests for repo2bench
+└── examples/
+    └── pydantic_marimo_blog/       # Full empirical case study ("Build the Data Factory for Your Software Factory")
+        ├── README.md               # Case study walkthrough & reproduction guide
+        ├── datasets/               # Mined Harbor datasets (10 Train + 20 Held-Out Test PRs)
+        ├── reports/                # Empirical Pass@1, Reward, Cost & Speed summaries (180 trials)
+        ├── optimized_agy_ws/       # Harness²-evolved Antigravity workspace (GEMINI.md + pytest-loop skill)
+        └── scripts/                # Mining & evaluation scripts used in the blog post
 ```
 
 ---
 
-## Included Datasets: `repo2bench-v2.0` (`10` Train + `20` Held-Out Test)
+## End-to-End Case Study (`examples/pydantic_marimo_blog/`)
 
-This repository ships with **`repo2bench-v2.0`**, a 30-task Harbor benchmark mined from real October 2026 commits across two fast-moving Python repositories (`pydantic/pydantic-ai` and `marimo-team/marimo`), split chronologically to guarantee zero data science leakage during agent harness optimization:
-- **`datasets/repo2bench-v2.0-train`** (`10` older PRs: `5` `pydantic-ai` + `5` `marimo`) — used **exclusively** for `Harness²` outer-loop skill & rule evolution.
-- **`datasets/repo2bench-v2.0-test`** (`20` newer Held-Out PRs: `10` `pydantic-ai` + `10` `marimo`) — used for blind evaluation across agent harnesses and models.
-- **Black-Box Pre-Commit Goal Prompts & Multi-Module Workspaces:** Every `instruction.md` in `v2.0` is synthesized as a pre-commit problem/goal description (`black_box=True`, zero file paths or code spoilers) and packs broad multi-module directories (`30–120` files per task) so agents must genuinely search and localize code before editing.
-
-Every task in `repo2bench-v2.0-train` (`10/10`) and `repo2bench-v2.0-test` (`20/20`) passes the strict `nop == 0.0 -> oracle == 1.0` deterministic verification gate.
+See **[`examples/pydantic_marimo_blog/README.md`](examples/pydantic_marimo_blog/README.md)** for the full datasets, empirical reports, and `Harness²`-optimized Antigravity configuration from the blog post *"Build the Data Factory for Your Software Factory: Benchmarking Coding Agents on Your Own Repo with `repo2bench`"*.
 
 ---
 
-## Native `AntigravitySubstrate` for `google-research/harness2`
+## License
 
-Under [`harness2_substrates/`](./harness2_substrates/), `repo2bench` also provides a native **Google Antigravity (`agy`)** substrate for [`google-research/harness2`](https://github.com/google-research/harness2) (addressing [`google-research/harness2#100`](https://github.com/google-research/harness2/issues/100)):
-- [`antigravity.py`](./harness2_substrates/antigravity.py): Defines `AGY_SURFACE` (`GEMINI.md`, `.agents/skills/**/SKILL.md`, `.agents/rules/*.md`, `scripts/**`, `config.yaml`), `AntigravitySubstrate`, and `render_agy_events` trajectory digest extraction.
-- [`agy_harness_agent.py`](./harness2_substrates/agy_harness_agent.py): Harbor `AgyAgent` subclass (`agy-harness`) that materializes the evolved `AGY_SURFACE` into `/workspace` before each trial rollout so Antigravity natively auto-discovers `GEMINI.md`, `.agents/rules/`, and `.agents/skills/`.
-- [`optimized_agy_ws/`](./harness2_substrates/optimized_agy_ws/): The `Harness²`-optimized Antigravity workspace evolved strictly on `repo2bench-v2.0-train`.
-
+Apache 2.0
