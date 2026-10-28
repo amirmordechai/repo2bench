@@ -30,3 +30,9 @@ This folder contains the complete datasets, scripts, empirical evaluation report
 | **#6 (Baseline)** | **Pi + Gemini 4 Argon (`high`)** | `50.0%` (`10/20`) | `50.0%` | `$0.376` | `22.9` | `5.4m` |
 | **#7 (Baseline)** | **Pi + Gemini 3.8 Flash (`high`)** | `47.4%` (`9/19`) | `47.4%` | `$0.425` | `35.2` | `5.6m` |
 | **#8 (Baseline)** | **Antigravity + Gemini 3.8 Flash (`high`)** | `45.0%` (`9/20`) | `45.0%` | `$0.461` | `44.1` | `5.7m` |
+
+---
+
+## Disclaimer
+
+Disclaimer: This code is provided "as-is" as a demonstration only to illustrate a potential solution. The code does not constitute a Google product or service of any kind, and Google offers no support, warranties, or liability of any kind with its regard. Whoever chooses to use this code accepts all responsibility related to it, including for its implementation, use, and ongoing maintenance. For the avoidance of doubt, this code is not eligible for the Google Open Source Software Vulnerability Rewards Program.
