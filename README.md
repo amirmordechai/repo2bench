@@ -1,5 +1,5 @@
 # `repo2bench`: Build your own custom coding benchmark
-### Build the Data Factory for Your Software Factory: Benchmarking Coding Agents on Your Own Repo with `repo2bench`
+### Build the Data Factory for Your Software Factory: Benchmark Coding Agents on Your Own Repo with `repo2bench` & Optimize with `Harness²`
 
 **`repo2bench`** turns any Git repository's activity history into a verified, container-isolated **[Harbor](https://github.com/harbor-bench/harbor)** coding agent benchmark in a single CLI command—and plugs directly into **[`Harness²` (`google-research/harness2`)](https://github.com/google-research/harness2)** so your coding agent continuously improves on your codebase.
 
@@ -59,7 +59,7 @@ repo2bench/
 
 ## End-to-End Case Study (`examples/pydantic_marimo_blog/`)
 
-See **[`examples/pydantic_marimo_blog/README.md`](examples/pydantic_marimo_blog/README.md)** for the full datasets, empirical reports, and `Harness²`-optimized Antigravity configuration from the blog post *"Build your own custom coding benchmark — Build the Data Factory for Your Software Factory: Benchmarking Coding Agents on Your Own Repo with `repo2bench`"*.
+See **[`examples/pydantic_marimo_blog/README.md`](examples/pydantic_marimo_blog/README.md)** for the full datasets, empirical reports, and `Harness²`-optimized Antigravity configuration from the blog post *"Build your own custom coding benchmark — Build the Data Factory for Your Software Factory: Benchmark Coding Agents on Your Own Repo with `repo2bench` & Optimize with `Harness²`"*.
 
 ---
 
