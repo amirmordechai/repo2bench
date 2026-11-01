@@ -1,11 +1,13 @@
-# `repo2bench`: Build your own custom coding benchmark
-### Build the Data Factory for Your Software Factory: Benchmark Coding Agents on Your Own Repo with [`repo2bench`](https://github.com/amirmordechai/repo2bench) & Optimize with [`Harness²`](https://github.com/google-research/harness2)
+# `repo2bench`: Build your own custom code benchmark
+### Build the Eval Factory for Your Software Factory: Benchmark Coding Agents on Your Own Repo with [`repo2bench`](https://github.com/amirmordechai/repo2bench) & Optimize with [`Harness²`](https://github.com/google-research/harness2)
 
 **`repo2bench`** turns any Git repository's activity history into a verified, container-isolated **[Harbor](https://github.com/harbor-bench/harbor)** coding agent benchmark in a single CLI command—and plugs directly into **[`Harness²` (`google-research/harness2`)](https://github.com/google-research/harness2)** so your coding agent continuously improves on your codebase.
 
 ---
 
 ## Why `repo2bench`?
+
+Easy code generation makes verification the bottleneck. When everyone has access to the same frontier models and agent harnesses, your unique advantage is your engineering judgment—and how systematically you turn that judgment into a custom benchmark that evaluates and optimizes agents on your own codebase.
 
 Public coding benchmarks test generic repositories (`pytest`, `copier`, `django`) that look nothing like your codebase. When you evaluate `Harness × Model × Thinking Budget` on your own repo:
 - **Leaderboard rankings flip:** Configurations that rank `#6` on generic public benchmarks can jump to `#1` on your architecture at a fraction of the cost.
@@ -47,7 +49,7 @@ repo2bench/
 ├── src/repo2bench/                 # Core CLI & Harbor task mining pipeline
 ├── tests/                          # Unit tests for repo2bench
 └── examples/
-    └── pydantic_marimo_blog/       # Full empirical case study ("Build the Data Factory for Your Software Factory")
+    └── pydantic_marimo_blog/       # Full empirical case study ("Build the Eval Factory for Your Software Factory")
         ├── README.md               # Case study walkthrough & reproduction guide
         ├── datasets/               # Mined Harbor datasets (10 Train + 20 Held-Out Test PRs)
         ├── reports/                # Empirical Pass@1, Reward, Cost & Speed summaries (180 trials)
@@ -59,7 +61,7 @@ repo2bench/
 
 ## End-to-End Case Study (`examples/pydantic_marimo_blog/`)
 
-See **[`examples/pydantic_marimo_blog/README.md`](examples/pydantic_marimo_blog/README.md)** for the full datasets, empirical reports, and `Harness²`-optimized Antigravity configuration from the blog post *"Build your own custom coding benchmark — Build the Data Factory for Your Software Factory: Benchmark Coding Agents on Your Own Repo with `repo2bench` & Optimize with `Harness²`"*.
+See **[`examples/pydantic_marimo_blog/README.md`](examples/pydantic_marimo_blog/README.md)** for the full datasets, empirical reports, and `Harness²`-optimized Antigravity configuration from the blog post *"Build your own custom code benchmark — Build the Eval Factory for Your Software Factory: Benchmark Coding Agents on Your Own Repo with `repo2bench` & Optimize with `Harness²`"*.
 
 ---
 

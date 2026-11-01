@@ -1,8 +1,8 @@
 # Example Case Study: Benchmarking & Optimizing Coding Agents on `pydantic-ai` and `marimo`
 
 This folder contains the complete datasets, scripts, empirical evaluation reports, and `Harness²`-optimized Antigravity configuration from the blog post:
-> **Build your own custom coding benchmark**
-> *Build the Data Factory for Your Software Factory: Benchmark Coding Agents on Your Own Repo with [`repo2bench`](https://github.com/amirmordechai/repo2bench) & Optimize with [`Harness²`](https://github.com/google-research/harness2)*
+> **Build your own custom code benchmark**
+> *Build the Eval Factory for Your Software Factory: Benchmark Coding Agents on Your Own Repo with [`repo2bench`](https://github.com/amirmordechai/repo2bench) & Optimize with [`Harness²`](https://github.com/google-research/harness2)*
 
 ---
 
