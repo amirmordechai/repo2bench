@@ -1,11 +1,11 @@
 # `repo2bench`: Build your own custom code benchmark
-### Build the Eval Factory for Your Software Factory: Benchmark Coding Agents on Your Own Repo
+### Build the Eval Factory for Your Software Factory: Benchmark Coding Agents on Your Own Repo with [`repo2bench`](https://github.com/amirmordechai/repo2bench) & [`Harbor`](https://github.com/harbor-framework/harbor)
 
 <p align="center">
   <img src="docs/assets/overview_flow.png" alt="Software Factory to Eval Factory Flywheel" width="100%">
 </p>
 
-**`repo2bench`** turns any Git repository's activity history into a verified, container-isolated **[Harbor](https://github.com/harbor-bench/harbor)** coding agent benchmark in a single CLI command—so you can evaluate and compare coding agents (`Harness × Model × Thinking Budget`) directly on your own codebase.
+**`repo2bench`** turns any Git repository's activity history into a verified, container-isolated **[Harbor](https://github.com/harbor-framework/harbor)** coding agent benchmark in a single CLI command—so you can evaluate and compare coding agents (`Harness × Model × Thinking Budget`) directly on your own codebase.
 
 ---
 
