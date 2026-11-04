@@ -1,17 +1,17 @@
 # `repo2bench`: Build your own custom code benchmark
-### Build the Eval Factory for Your Software Factory: Benchmark Coding Agents on Your Own Repo with [`repo2bench`](https://github.com/amirmordechai/repo2bench) & [`Harbor`](https://github.com/harbor-framework/harbor)
+### Build the Eval Factory for Your Software Factory: Benchmark Coding Agents on Your Own Repo with [`repo2bench`](https://github.com/amirmordechai/repo2bench) (Built on [`Harbor`](https://github.com/harbor-framework/harbor))
 
 <p align="center">
   <img src="docs/assets/overview_flow.png" alt="Software Factory to Eval Factory Flywheel" width="100%">
 </p>
 
-**`repo2bench`** turns any Git repository's activity history into a verified, container-isolated **[Harbor](https://github.com/harbor-framework/harbor)** coding agent benchmark in a single CLI command—so you can evaluate and compare coding agents (`Harness × Model × Thinking Budget`) directly on your own codebase.
+**`repo2bench`** mines any Git repository's pull-request history into a verified, leak-free coding agent benchmark and evaluates **`Harness × Model × Thinking Budget`** configurations in isolated **[Harbor](https://github.com/harbor-framework/harbor)** Docker sandboxes—producing your repo's Quality-vs.-Cost leaderboard and chart in two CLI commands.
 
 ---
 
 ## Why `repo2bench`?
 
-How do most teams pick their coding agent today? Brand hype, top-down mandates, 30 minutes of manual "vibe testing," or checking generic public leaderboards like SWE-bench Verified, Terminal-Bench, or SWE-bench Pro. None of those test your architecture, your conventions, or your test suite.
+How do most teams pick their coding agent today? Brand hype, top-down mandates, 30 minutes of manual "vibe testing," or checking generic public leaderboards like **[Terminal-Bench 4.0](https://www.vals.ai/benchmarks/terminal-bench-4)**, **[Vibe Code Bench](https://www.vals.ai/benchmarks/vibe-code)**, or **[Artificial Analysis](https://artificialanalysis.ai/leaderboards/models)**—where frontier models like **Gemini 4 Carbon** and **Gemini 4 Argon** compete on public benchmarks. None of those test *your* architecture, *your* conventions, or *your* test suite.
 
 Easy code generation makes verification the bottleneck: when everyone has access to the same frontier models and agent harnesses, your unique advantage is your engineering judgment—and how systematically you turn that judgment into an **Eval Factory** for your **Software Factory**.
 
@@ -49,6 +49,19 @@ What `repo2bench` does automatically:
    - **Starting Workspace (`environment/`):** Repository checked out at `base_commit` before the fix, with future Git history stripped.
    - **Goal-Oriented Prompt (`instruction.md`):** Synthesizes a pre-commit problem statement from the issue/PR motivation and test expectations—stripping target file paths and commit-message solution spoilers.
    - **Hidden Test Grader (`tests/`):** Runs only after the agent finishes.
+
+### 3. Evaluate & Rank Coding Agents (`repo2bench eval`)
+
+```bash
+repo2bench eval \
+  --dataset ./my-repo-bench \
+  --agents antigravity,pi \
+  --models gemini-4-argon,gemini-3.8-flash \
+  --thinking medium,high \
+  --output ./results/my-repo-eval
+```
+
+`repo2bench eval` executes each `(agent × model × thinking)` configuration in isolated Harbor Docker containers, computes `Pass@1`, mean API cost per task, turn count, and wall-clock speed, and writes `leaderboard.md`, `leaderboard.json`, and the `leaderboard_xy` Quality-vs.-Cost chart.
 
 ---
 

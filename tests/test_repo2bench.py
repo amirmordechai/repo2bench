@@ -83,3 +83,63 @@ def test_end_to_end_mine_emit_validate(tmp_path: Path) -> None:
     assert val.nop_pass_rate < 1.0
     assert val.oracle_pass_rate == 1.0
 
+
+def test_cli_eval_dry_run_and_leaderboard_aggregation(tmp_path: Path) -> None:
+    """Verify `repo2bench eval` generates Harbor job configs, aggregates trial telemetry, and writes leaderboard + XY chart."""
+    import json
+    from repo2bench.cli import main
+
+    ds_dir = tmp_path / "dataset" / "tasks" / "sample-task-1"
+    ds_dir.mkdir(parents=True)
+    out_dir = tmp_path / "eval_out"
+
+    rc = main(
+        [
+            "eval",
+            "--dataset",
+            str(tmp_path / "dataset"),
+            "--agents",
+            "antigravity,pi",
+            "--models",
+            "gemini-4-argon,gemini-3.8-flash",
+            "--thinking",
+            "medium,high",
+            "--output",
+            str(out_dir),
+            "--dry-run",
+        ]
+    )
+    assert rc == 0
+    assert len(list((out_dir / "configs").glob("*.yaml"))) == 8
+
+    # Populate synthetic Harbor trial outputs for 2 candidates and aggregate
+    t1 = out_dir / "trials" / "pi-gemini-4-argon-medium" / "job1" / "sample-task-1__001"
+    (t1 / "verifier").mkdir(parents=True)
+    (t1 / "agent").mkdir(parents=True)
+    (t1 / "result.json").write_text(json.dumps({"task_name": "sample-task-1", "duration_sec": 240.0}), encoding="utf-8")
+    (t1 / "verifier" / "reward.json").write_text(json.dumps({"reward": 1.0}), encoding="utf-8")
+    (t1 / "agent" / "trajectory.json").write_text(
+        json.dumps({"final_metrics": {"total_prompt_tokens": 100000, "total_cached_tokens": 80000, "total_completion_tokens": 5000, "total_turns": 18}}),
+        encoding="utf-8",
+    )
+
+    t2 = out_dir / "trials" / "antigravity-gemini-3.8-flash-medium" / "job1" / "sample-task-1__001"
+    (t2 / "verifier").mkdir(parents=True)
+    (t2 / "agent").mkdir(parents=True)
+    (t2 / "result.json").write_text(json.dumps({"task_name": "sample-task-1", "duration_sec": 310.0}), encoding="utf-8")
+    (t2 / "verifier" / "reward.json").write_text(json.dumps({"reward": 0.0}), encoding="utf-8")
+    (t2 / "agent" / "trajectory.json").write_text(
+        json.dumps({"final_metrics": {"total_prompt_tokens": 300000, "total_cached_tokens": 200000, "total_completion_tokens": 12000, "total_turns": 42}}),
+        encoding="utf-8",
+    )
+
+    rc_agg = main(["eval", "--output", str(out_dir), "--results-only"])
+    assert rc_agg == 0
+    lb = json.loads((out_dir / "leaderboard.json").read_text(encoding="utf-8"))
+    assert len(lb["candidates"]) == 2
+    assert lb["candidates"][0]["candidate_key"] == "pi-gemini-4-argon-medium"
+    assert lb["candidates"][0]["pass_at_1_pct"] == 100.0
+    assert (out_dir / "leaderboard.md").is_file()
+    assert (out_dir / "leaderboard_xy.svg").is_file()
+
+
