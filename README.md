@@ -11,11 +11,13 @@
 
 ## Why `repo2bench`?
 
-Easy code generation makes verification the bottleneck. When everyone has access to the same frontier models and agent harnesses, your unique advantage is your engineering judgment—and how systematically you turn that judgment into a custom benchmark that evaluates and improves agents on your own codebase.
+How do most teams pick their coding agent today? Brand hype, top-down mandates, 30 minutes of manual "vibe testing," or checking generic public leaderboards like SWE-bench Verified, Terminal-Bench, or SWE-bench Pro. None of those test your architecture, your conventions, or your test suite.
 
-Public coding benchmarks test generic repositories (`pytest`, `copier`, `django`) that look nothing like your codebase. When you evaluate `Harness × Model × Thinking Budget` on your own repo:
-- **Leaderboard rankings flip:** Configurations that rank `#6` on generic public benchmarks can jump to `#1` on your architecture at a fraction of the cost.
-- **Hidden harness bottlenecks surface:** You immediately see where an agent's tool loop, context caching, or test-execution strategy breaks down on your repo's layout—giving you a concrete target to tune your agent rules, skills, and prompts.
+Easy code generation makes verification the bottleneck: when everyone has access to the same frontier models and agent harnesses, your unique advantage is your engineering judgment—and how systematically you turn that judgment into an **Eval Factory** for your **Software Factory**.
+
+When you evaluate `Harness × Model × Thinking Budget` directly on your own repo:
+- **Counter-intuitive quality & cost winners emerge:** Models with higher per-token list prices can cost **40%+ less per task** when they localize bugs in half the turns, while cranking `Thinking Budget` from `medium` to `high` can actually *lower* accuracy on multi-module repos.
+- **Hidden harness bottlenecks surface:** Container trajectories immediately reveal where an agent's tool loop, prefix caching, or `pytest` strategy breaks down on your repo's layout—giving you a concrete `Train / Held-Out Test` split to evolve repo-specific prompts, skills, and verification scripts (manual or automated via [`Harness²`](https://github.com/google-research/harness2)).
 
 ---
 
