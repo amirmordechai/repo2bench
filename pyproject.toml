@@ -21,6 +21,11 @@ dev = [
   "pytest>=8.0",
 ]
 
+[project.urls]
+Homepage = "https://github.com/amirmordechai/repo2bench"
+Repository = "https://github.com/amirmordechai/repo2bench"
+"Blog Post" = "https://medium.com/google-cloud/build-your-own-custom-code-benchmark-12b2673f1906"
+
 [project.scripts]
 repo2bench = "repo2bench.cli:main"
 

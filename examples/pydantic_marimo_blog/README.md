@@ -1,7 +1,7 @@
 # Example Case Study: Benchmarking & Auto-Tuning Coding Agents on `pydantic-ai` and `marimo`
 
-This folder contains the complete datasets, scripts, empirical evaluation reports, and [`Harness²`](https://github.com/google-research/harness2)-auto-tuned Antigravity configuration from the blog post:
-> **Build your own custom code benchmark**
+This folder contains the complete datasets, scripts, empirical evaluation reports, and [`Harness²`](https://github.com/google-research/harness2)-auto-tuned Antigravity configuration from the Google Cloud blog post:
+> **[Build your own custom code benchmark](https://medium.com/google-cloud/build-your-own-custom-code-benchmark-12b2673f1906)**
 > *Build the Eval Factory for Your Software Factory: Benchmark Coding Agents on Your Own Repo with [`repo2bench`](https://github.com/amirmordechai/repo2bench) (Built on [`Harbor`](https://github.com/harbor-framework/harbor)), and Auto-Tune with [`Harness²`](https://github.com/google-research/harness2)*
 
 ---

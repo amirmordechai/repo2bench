@@ -7,6 +7,8 @@
 
 **`repo2bench`** mines any Git repository's pull-request history into a verified, leak-free coding agent benchmark and evaluates **`Harness × Model × Thinking Budget`** configurations in isolated **[Harbor](https://github.com/harbor-framework/harbor)** Docker sandboxes—producing your repo's Quality-vs.-Cost leaderboard and chart in two CLI commands.
 
+📖 **Read the accompanying Google Cloud blog post:** [**Build your own custom code benchmark**](https://medium.com/google-cloud/build-your-own-custom-code-benchmark-12b2673f1906)
+
 ---
 
 ## Why `repo2bench`?
@@ -142,7 +144,7 @@ repo2bench/
 
 ## End-to-End Case Study (`examples/pydantic_marimo_blog/`)
 
-See **[`examples/pydantic_marimo_blog/README.md`](examples/pydantic_marimo_blog/README.md)** for the full datasets, empirical evaluation reports across 8 Gemini agent configurations, and the [`Harness²`](https://github.com/google-research/harness2) auto-tuning case study from the accompanying blog post (*"Build your own custom code benchmark — Build the Eval Factory for Your Software Factory"*).
+See **[`examples/pydantic_marimo_blog/README.md`](examples/pydantic_marimo_blog/README.md)** for the full datasets, empirical evaluation reports across 8 Gemini agent configurations, and the [`Harness²`](https://github.com/google-research/harness2) auto-tuning case study from the accompanying Google Cloud blog post ([**"Build your own custom code benchmark — Build the Eval Factory for Your Software Factory"**](https://medium.com/google-cloud/build-your-own-custom-code-benchmark-12b2673f1906)).
 
 ---
 
