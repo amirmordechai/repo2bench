@@ -11,9 +11,9 @@
 
 ## Why `repo2bench`?
 
-How do most teams pick their coding agent today? Brand hype, top-down mandates, 30 minutes of manual "vibe testing," or checking generic public leaderboards like **[Terminal-Bench 4.0](https://www.vals.ai/benchmarks/terminal-bench-4)**, **[Vibe Code Bench](https://www.vals.ai/benchmarks/vibe-code)**, or **[Artificial Analysis](https://artificialanalysis.ai/leaderboards/models)**—where frontier models like **Gemini 4 Carbon** and **Gemini 4 Argon** compete on public benchmarks. None of those test *your* architecture, *your* conventions, or *your* test suite.
+How do most teams pick their coding agent today? Brand hype, top-down mandates, 30 minutes of manual "vibe testing," or checking generic public leaderboards like **[Terminal-Bench 4.0](https://www.vals.ai/benchmarks/terminal-bench-4)**, **[Vibe Code Bench](https://www.vals.ai/benchmarks/vibe-code)**, or **[Artificial Analysis](https://artificialanalysis.ai/leaderboards/models)**. None of those test *your* architecture, *your* conventions, or *your* test suite.
 
-Easy code generation makes verification the bottleneck: when everyone has access to the same frontier models and agent harnesses, your unique advantage is your engineering judgment—and how systematically you turn that judgment into an **Eval Factory** for your **Software Factory**.
+When everyone has access to the same frontier models and agent harnesses, your unique advantage is your engineering judgment—and how systematically you turn that judgment into an **Eval Factory** for your **Software Factory**.
 
 When you evaluate `Harness × Model × Thinking Budget` directly on your own repo:
 - **Counter-intuitive quality & cost winners emerge:** Models with higher per-token list prices can cost **40%+ less per task** when they localize bugs in half the turns, while cranking `Thinking Budget` from `medium` to `high` can actually *lower* accuracy on multi-module repos.
