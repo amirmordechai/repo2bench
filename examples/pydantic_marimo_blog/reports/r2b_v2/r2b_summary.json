@@ -19,10 +19,7 @@
       "total_cost_usd": 4.315,
       "cache_hit_pct": 70.0,
       "mean_turns": 16,
-      "mean_duration_sec": 272.8,
-      "public_pass_at_1_pct": 25.0,
-      "public_reward_pct": 36.2,
-      "public_cost_usd": 0.89
+      "mean_duration_sec": 272.8
     },
     {
       "candidate_key": "antigravity-gemini-4-argon-medium",
@@ -40,10 +37,7 @@
       "total_cost_usd": 5.799,
       "cache_hit_pct": 76.9,
       "mean_turns": 15.2,
-      "mean_duration_sec": 315.0,
-      "public_pass_at_1_pct": 35.0,
-      "public_reward_pct": 50.0,
-      "public_cost_usd": 1.44
+      "mean_duration_sec": 315.0
     },
     {
       "candidate_key": "antigravity-gemini-4-argon-high",
@@ -61,10 +55,7 @@
       "total_cost_usd": 8.446,
       "cache_hit_pct": 83.1,
       "mean_turns": 20.1,
-      "mean_duration_sec": 309.3,
-      "public_pass_at_1_pct": 20.0,
-      "public_reward_pct": 33.4,
-      "public_cost_usd": 2.08
+      "mean_duration_sec": 309.3
     },
     {
       "candidate_key": "antigravity-gemini-3.8-flash-medium",
@@ -82,10 +73,7 @@
       "total_cost_usd": 7.687,
       "cache_hit_pct": 84.9,
       "mean_turns": 50.1,
-      "mean_duration_sec": 334.5,
-      "public_pass_at_1_pct": 35.0,
-      "public_reward_pct": 49.0,
-      "public_cost_usd": 0.3
+      "mean_duration_sec": 334.5
     },
     {
       "candidate_key": "pi-gemini-4-argon-high",
@@ -103,10 +91,7 @@
       "total_cost_usd": 7.51,
       "cache_hit_pct": 79.8,
       "mean_turns": 23.8,
-      "mean_duration_sec": 325.0,
-      "public_pass_at_1_pct": 25.0,
-      "public_reward_pct": 36.2,
-      "public_cost_usd": 2.38
+      "mean_duration_sec": 325.0
     },
     {
       "candidate_key": "pi-gemini-3.8-flash-medium",
@@ -124,10 +109,7 @@
       "total_cost_usd": 7.642,
       "cache_hit_pct": 80.0,
       "mean_turns": 50.1,
-      "mean_duration_sec": 312.6,
-      "public_pass_at_1_pct": 35.0,
-      "public_reward_pct": 45.2,
-      "public_cost_usd": 0.37
+      "mean_duration_sec": 312.6
     },
     {
       "candidate_key": "pi-gemini-3.8-flash-high",
@@ -145,10 +127,7 @@
       "total_cost_usd": 8.454,
       "cache_hit_pct": 83.9,
       "mean_turns": 56.8,
-      "mean_duration_sec": 335.6,
-      "public_pass_at_1_pct": 25.0,
-      "public_reward_pct": 41.2,
-      "public_cost_usd": 0.65
+      "mean_duration_sec": 335.6
     },
     {
       "candidate_key": "antigravity-gemini-3.8-flash-high",
@@ -166,10 +145,7 @@
       "total_cost_usd": 9.218,
       "cache_hit_pct": 86.7,
       "mean_turns": 57.7,
-      "mean_duration_sec": 339.0,
-      "public_pass_at_1_pct": 25.0,
-      "public_reward_pct": 38.4,
-      "public_cost_usd": 0.25
+      "mean_duration_sec": 339.0
     },
     {
       "candidate_key": "agy-harness-gemini-3.8-flash-medium",
@@ -187,10 +163,7 @@
       "total_cost_usd": 6.304,
       "cache_hit_pct": 85.6,
       "mean_turns": 38.6,
-      "mean_duration_sec": 266.5,
-      "public_pass_at_1_pct": null,
-      "public_reward_pct": null,
-      "public_cost_usd": null
+      "mean_duration_sec": 266.5
     }
   ],
   "trials": [

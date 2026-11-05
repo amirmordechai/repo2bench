@@ -29,9 +29,15 @@ def cmd_mine(args: argparse.Namespace) -> int:
     )
     print(f"[repo2bench] Found {len(commits)} candidate commits with paired code + test diffs.")
 
+    extra_pkgs = _split_csv(args.pip_packages) if args.pip_packages else None
     emitted: list[str] = []
     for c in commits:
-        tdir = emit_harbor_task(c, out_dir)
+        tdir = emit_harbor_task(
+            c,
+            out_dir,
+            extra_pip_packages=extra_pkgs,
+            base_image=args.base_image,
+        )
         emitted.append(tdir.name)
         print(f"  + Emitted Harbor task: {tdir.name} [{c.difficulty}] ({len(c.src_files)} src, {len(c.test_files)} test)")
 
@@ -176,6 +182,8 @@ def build_parser() -> argparse.ArgumentParser:
         help="Maximum number of benchmark tasks to emit",
     )
     p_mine.add_argument("--output", required=True, help="Output Harbor dataset directory")
+    p_mine.add_argument("--base-image", default=None, help="Custom Docker base image for emitted tasks (default: python:3.12-slim)")
+    p_mine.add_argument("--pip-packages", default=None, help="Comma-separated extra pip packages to pre-install in task containers")
     p_mine.add_argument("--validate", action="store_true", help="Run Fail -> Pass validation after emitting")
     p_mine.add_argument("--python-bin", default=sys.executable, help="Python executable for pytest validation")
     p_mine.set_defaults(func=cmd_mine)

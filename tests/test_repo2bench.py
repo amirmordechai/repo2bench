@@ -143,3 +143,61 @@ def test_cli_eval_dry_run_and_leaderboard_aggregation(tmp_path: Path) -> None:
     assert (out_dir / "leaderboard_xy.svg").is_file()
 
 
+def test_src_layout_repo_cli_mine_and_validate(tmp_path: Path) -> None:
+    """Verify `repo2bench mine --validate` works out-of-the-box on a standard `src/<pkg>` layout repository."""
+    from repo2bench.cli import main
+
+    repo = tmp_path / "src_repo"
+    (repo / "src" / "my_service").mkdir(parents=True)
+    (repo / "tests").mkdir(parents=True)
+
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+    subprocess.run(["git", "config", "user.email", "dev@example.com"], cwd=repo, check=True)
+    subprocess.run(["git", "config", "user.name", "Dev"], cwd=repo, check=True)
+
+    (repo / "src" / "my_service" / "__init__.py").write_text("", encoding="utf-8")
+    (repo / "src" / "my_service" / "math_ops.py").write_text(
+        "def clamp(x: int, lo: int, hi: int) -> int:\n    return max(lo, x)\n",
+        encoding="utf-8",
+    )
+    (repo / "tests" / "test_math_ops.py").write_text(
+        "from my_service.math_ops import clamp\n\ndef test_lower_bound() -> None:\n    assert clamp(-5, 0, 10) == 0\n",
+        encoding="utf-8",
+    )
+    subprocess.run(["git", "add", "-A"], cwd=repo, check=True)
+    subprocess.run(["git", "commit", "-q", "-m", "init"], cwd=repo, check=True)
+
+    (repo / "src" / "my_service" / "math_ops.py").write_text(
+        "def clamp(x: int, lo: int, hi: int) -> int:\n    return min(hi, max(lo, x))\n",
+        encoding="utf-8",
+    )
+    (repo / "tests" / "test_math_ops.py").write_text(
+        "from my_service.math_ops import clamp\n\ndef test_lower_bound() -> None:\n    assert clamp(-5, 0, 10) == 0\n\ndef test_upper_bound() -> None:\n    assert clamp(25, 0, 10) == 10\n",
+        encoding="utf-8",
+    )
+    subprocess.run(["git", "add", "-A"], cwd=repo, check=True)
+    subprocess.run(["git", "commit", "-q", "-m", "fix: enforce upper bound in clamp (#7)"], cwd=repo, check=True)
+
+    out_ds = tmp_path / "mined_ds"
+    rc = main(
+        [
+            "mine",
+            "--repo",
+            str(repo),
+            "--since",
+            "2020-01-01",
+            "--limit-num-tasks",
+            "5",
+            "--pip-packages",
+            "rich",
+            "--validate",
+            "--output",
+            str(out_ds),
+        ]
+    )
+    assert rc == 0
+    rc_val = main(["validate", "--dataset", str(out_ds)])
+    assert rc_val == 0
+
+
+

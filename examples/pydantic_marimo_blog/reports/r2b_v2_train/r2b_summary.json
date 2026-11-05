@@ -19,10 +19,7 @@
       "total_cost_usd": 3.014,
       "cache_hit_pct": 81.8,
       "mean_turns": 45.8,
-      "mean_duration_sec": 271.2,
-      "public_pass_at_1_pct": 35.0,
-      "public_reward_pct": 49.0,
-      "public_cost_usd": 0.3
+      "mean_duration_sec": 271.2
     },
     {
       "candidate_key": "agy-harness-gemini-3.8-flash-medium",
@@ -40,10 +37,7 @@
       "total_cost_usd": 2.854,
       "cache_hit_pct": 84.1,
       "mean_turns": 37,
-      "mean_duration_sec": 221.7,
-      "public_pass_at_1_pct": null,
-      "public_reward_pct": null,
-      "public_cost_usd": null
+      "mean_duration_sec": 221.7
     }
   ],
   "trials": [

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Standalone Harbor & WorkBuddy Bench compatible scorer for repo2bench tasks."""
+"""Standalone Harbor-compatible scorer for repo2bench tasks."""
 
 import argparse
 import json

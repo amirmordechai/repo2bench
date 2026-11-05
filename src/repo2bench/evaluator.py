@@ -61,10 +61,12 @@ def build_harbor_job_yaml(
     thinking: str,
     concurrency: int,
 ) -> dict[str, Any]:
+    _ = job_slug
     return {
-        "job_name": job_slug,
         "jobs_dir": str(jobs_dir),
         "n_concurrent_trials": concurrency,
+        "n_attempts": 1,
+        "environment": {"type": "docker"},
         "datasets": [{"path": str(tasks_dir)}],
         "agents": [
             {

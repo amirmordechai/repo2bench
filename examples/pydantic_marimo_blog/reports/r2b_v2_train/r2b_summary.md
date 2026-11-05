@@ -1,11 +1,11 @@
-# `repo2bench-v1.0` Empirical Evaluation Summary (20 Tasks × 9 Candidates = 180 Trials)
+# `repo2bench-v2.0-train` Evaluation Summary (10 Chronological Train PRs)
 
-- **Total Trials Completed:** `20`
+- **Total Trials Completed:** `20` (`10` tasks × `2` candidates)
 - **Total Campaign Spend:** `$5.87`
 
-## 1. Custom Repo Benchmark (`repo2bench-v1.0`) vs. Public Benchmark (`wb-bench-code-v1.0`)
+## Stock vs. `Harness²` Auto-Tuned Agent on Train Split (`repo2bench-v2.0-train`)
 
-| Candidate (`Harness + Model + Thinking`) | Custom Pass@1 | Custom Reward | `pydantic-ai` | `marimo` | Custom Cost/Task | Cache Hit % | Mean Time | Public Pass@1 | Public Cost/Task |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| `antigravity-gemini-3.8-flash-medium` | **70.0%** | 70.0% | 60% | 80% | **$0.301** | 81.8% | 271s | 35.0% | $0.30 |
-| `agy-harness-gemini-3.8-flash-medium` | **90.0%** | 90.0% | 80% | 100% | **$0.285** | 84.1% | 222s | — | — |
+| Candidate (`Harness + Model + Thinking`) | Train Pass@1 | `pydantic-ai` | `marimo` | Cost / Task | Cache Hit % | Mean Time |
+|---|---:|---:|---:|---:|---:|---:|
+| `agy-harness-gemini-3.8-flash-medium` (`Harness²`) | **90.0%** | 80% | 100% | **$0.285** | 84.1% | 222s |
+| `antigravity-gemini-3.8-flash-medium` (Stock) | **70.0%** | 60% | 80% | **$0.301** | 81.8% | 271s |

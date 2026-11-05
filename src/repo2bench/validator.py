@@ -104,6 +104,7 @@ def _run_state_check(
         env = os.environ.copy()
         extra_paths = [
             str(ws_dir),
+            str(ws_dir / "src"),
             str(ws_dir / "pydantic_ai_slim"),
             str(ws_dir / "pydantic_graph"),
             str(ws_dir / "src" / "pydantic_ai_harness"),

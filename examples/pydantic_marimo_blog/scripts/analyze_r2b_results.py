@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
-"""Analyze empirical results from the 9-candidate repo2bench-v1.0 campaign (180 trials).
+"""Analyze empirical Harbor trial directories from a `repo2bench` evaluation campaign.
 
 Computes per-candidate:
-- Pass@1 (%), Continuous Reward (%), File Hit Rate (%), Diff Coverage (%)
+- Pass@1 (%), File Hit Rate (%), Diff Coverage (%)
 - Mean Cost/Task ($), Total Cost ($), Cache Hit Rate (%), Mean Turns, Mean Duration (s)
 - Breakdown by repository (`pydantic/pydantic-ai` vs `marimo-team/marimo`) and difficulty
-- Side-by-side comparison against the public benchmark (`wb-bench-code-v1.0`)
-- Baseline vs Harness² Optimized (`AntigravitySubstrate`) comparison
 """
 
 from __future__ import annotations
@@ -14,26 +12,14 @@ from __future__ import annotations
 import argparse
 import json
 import statistics
-import tomllib
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 PRICING = {
     "gemini-4-argon": {"in": 2.00, "cache_read": 0.10, "out": 10.00},
     "gemini-3.8-flash": {"in": 0.75, "cache_read": 0.075, "out": 3.75},
-}
-
-PUBLIC_BENCH_REFERENCE = {
-    "antigravity-gemini-3.8-flash-medium": {"pass_at_1": 35.0, "reward": 49.0, "cost": 0.30, "rank_quality": 2},
-    "antigravity-gemini-3.8-flash-high": {"pass_at_1": 25.0, "reward": 38.4, "cost": 0.25, "rank_quality": 5},
-    "antigravity-gemini-4-argon-medium": {"pass_at_1": 35.0, "reward": 50.0, "cost": 1.44, "rank_quality": 1},
-    "antigravity-gemini-4-argon-high": {"pass_at_1": 20.0, "reward": 33.4, "cost": 2.08, "rank_quality": 8},
-    "pi-gemini-3.8-flash-medium": {"pass_at_1": 35.0, "reward": 45.2, "cost": 0.37, "rank_quality": 3},
-    "pi-gemini-3.8-flash-high": {"pass_at_1": 25.0, "reward": 41.2, "cost": 0.65, "rank_quality": 4},
-    "pi-gemini-4-argon-medium": {"pass_at_1": 25.0, "reward": 36.2, "cost": 0.89, "rank_quality": 6},
-    "pi-gemini-4-argon-high": {"pass_at_1": 25.0, "reward": 36.2, "cost": 2.38, "rank_quality": 7},
 }
 
 
@@ -47,11 +33,11 @@ def _safe_json(p: Path) -> dict[str, Any]:
         return {}
 
 
-def load_vertex_turns(vertex_log_dir: Path) -> dict[str, list[dict[str, Any]]]:
+def load_turn_logs(turn_log_dir: Path | None) -> dict[str, list[dict[str, Any]]]:
     by_trial: dict[str, list[dict[str, Any]]] = defaultdict(list)
-    if not vertex_log_dir.is_dir():
+    if not turn_log_dir or not turn_log_dir.is_dir():
         return by_trial
-    for p in sorted(vertex_log_dir.glob("*.jsonl")):
+    for p in sorted(turn_log_dir.glob("*.jsonl")):
         if p.name.startswith("judge_"):
             continue
         for line in p.read_text(encoding="utf-8", errors="replace").splitlines():
@@ -84,7 +70,7 @@ def parse_job_slug(job_slug: str) -> tuple[str, str, str, str]:
         harness = parts[0]
         rest = parts[1] if len(parts) > 1 else slug
 
-    thinking = "high"
+    thinking = "medium"
     model = rest
     for lvl in ("low", "medium", "high"):
         if rest.endswith(f"-{lvl}"):
@@ -96,29 +82,29 @@ def parse_job_slug(job_slug: str) -> tuple[str, str, str, str]:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--repo-root", type=Path, default=Path("/opt/wb-eval/workbuddy-bench"))
-    parser.add_argument("--results-subdir", type=str, default="results_r2b")
-    parser.add_argument("--vertex-log-dir", type=Path, default=Path("/opt/wb-eval/logs/vertex_turns"))
-    parser.add_argument("--out-dir", type=Path, default=Path("/opt/wb-eval/reports/r2b"))
+    parser = argparse.ArgumentParser(description="Aggregate Harbor trial directories into repo2bench summary reports.")
+    parser.add_argument("--trials-dir", type=Path, default=Path("./results/r2b_v2/trials"))
+    parser.add_argument("--turn-log-dir", type=Path, default=None)
+    parser.add_argument("--out-dir", type=Path, default=Path("./reports/r2b_v2"))
     args = parser.parse_args()
 
     args.out_dir.mkdir(parents=True, exist_ok=True)
-    results_root = args.repo_root / args.results_subdir
-    vertex_by_trial = load_vertex_turns(args.vertex_log_dir)
+    results_root = args.trials_dir
+    turns_by_trial = load_turn_logs(args.turn_log_dir)
 
     latest_trial_dirs: dict[tuple[str, str], Path] = {}
-    for job_dir in sorted(results_root.iterdir()):
-        if not job_dir.is_dir() or job_dir.name.startswith(".") or job_dir.name == "smoke-r2b":
-            continue
-        for rpath in sorted(job_dir.rglob("result.json")):
-            tdir = rpath.parent
-            if "__" not in tdir.name or not (tdir / "agent").is_dir():
+    if results_root.is_dir():
+        for job_dir in sorted(results_root.iterdir()):
+            if not job_dir.is_dir() or job_dir.name.startswith("."):
                 continue
-            rjson = _safe_json(rpath)
-            raw_tname = str(rjson.get("task_name") or "").strip()
-            task_id = raw_tname.split("/")[-1] if raw_tname else tdir.name.split("__", 1)[0]
-            latest_trial_dirs[(job_dir.name, task_id)] = tdir
+            for rpath in sorted(job_dir.rglob("result.json")):
+                tdir = rpath.parent
+                if "__" not in tdir.name and not (tdir / "agent").is_dir():
+                    continue
+                rjson = _safe_json(rpath)
+                raw_tname = str(rjson.get("task_name") or "").strip()
+                task_id = raw_tname.split("/")[-1] if raw_tname else tdir.name.split("__", 1)[0]
+                latest_trial_dirs[(job_dir.name, task_id)] = tdir
 
     trials: list[dict[str, Any]] = []
     for (job_slug, task_id), tdir in sorted(latest_trial_dirs.items()):
@@ -142,7 +128,7 @@ def main() -> int:
         fhr = float(score_json.get("file_hit_rate", 1.0 if passed else 0.0))
         dcov = float(score_json.get("diff_coverage", 1.0 if passed else 0.0))
 
-        vturns = vertex_by_trial.get(trial_id, [])
+        vturns = turns_by_trial.get(trial_id, [])
         pricing = PRICING.get(model, {"in": 0.75, "cache_read": 0.075, "out": 3.75})
         if vturns:
             in_tok = sum(int(vt.get("input_tokens") or 0) for vt in vturns)
@@ -163,7 +149,6 @@ def main() -> int:
             ) / 1_000_000.0
             turns_count = len(traj_json.get("steps") or [])
 
-        # Duration sec
         dur_sec = 0.0
         ar = result_json.get("agent_execution") or result_json.get("agent_result") or {}
         if ar.get("duration_sec"):
@@ -230,7 +215,6 @@ def main() -> int:
         pyd_pass = sum(1 for r in pyd_rows if r["passed"]) / len(pyd_rows) * 100.0 if pyd_rows else 0.0
         mar_pass = sum(1 for r in mar_rows if r["passed"]) / len(mar_rows) * 100.0 if mar_rows else 0.0
 
-        pub = PUBLIC_BENCH_REFERENCE.get(cand_key, {})
         summary_rows.append(
             {
                 "candidate_key": cand_key,
@@ -249,17 +233,11 @@ def main() -> int:
                 "cache_hit_pct": round(cache_hit_pct, 1),
                 "mean_turns": round(mean_turns, 1),
                 "mean_duration_sec": round(mean_dur, 1),
-                "public_pass_at_1_pct": pub.get("pass_at_1"),
-                "public_reward_pct": pub.get("reward"),
-                "public_cost_usd": pub.get("cost"),
             }
         )
 
-    # Sort baseline 8 candidates by (mean_reward_pct DESC, pass_at_1_pct DESC, -mean_cost_usd DESC)
     summary_rows.sort(
         key=lambda r: (
-            0 if r["harness"] == "agy-harness" else 1,
-            r["mean_reward_pct"],
             r["pass_at_1_pct"],
             -r["mean_cost_usd"],
         ),
@@ -267,32 +245,28 @@ def main() -> int:
     )
 
     out_json = {
-        "generated_at": datetime.utcnow().isoformat() + "Z",
+        "generated_at": datetime.now(timezone.utc).isoformat(),
         "total_trials": len(trials),
         "total_campaign_cost_usd": round(sum(r["total_cost_usd"] for r in summary_rows), 2),
         "candidates": summary_rows,
         "trials": trials,
     }
-    (args.out_dir / "r2b_summary.json").write_text(json.dumps(out_json, indent=2), encoding="utf-8")
+    (args.out_dir / "r2b_summary.json").write_text(json.dumps(out_json, indent=2) + "\n", encoding="utf-8")
 
     md_lines = [
-        "# `repo2bench-v1.0` Empirical Evaluation Summary (20 Tasks × 9 Candidates = 180 Trials)",
+        "# `repo2bench` Empirical Evaluation Summary",
         "",
         f"- **Total Trials Completed:** `{len(trials)}`",
         f"- **Total Campaign Spend:** `${out_json['total_campaign_cost_usd']:.2f}`",
         "",
-        "## 1. Custom Repo Benchmark (`repo2bench-v1.0`) vs. Public Benchmark (`wb-bench-code-v1.0`)",
-        "",
-        "| Candidate (`Harness + Model + Thinking`) | Custom Pass@1 | Custom Reward | `pydantic-ai` | `marimo` | Custom Cost/Task | Cache Hit % | Mean Time | Public Pass@1 | Public Cost/Task |",
-        "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+        "| Candidate (`Harness + Model + Thinking`) | Pass@1 | `pydantic-ai` | `marimo` | Cost / Task | Cache Hit % | Mean Time |",
+        "|---|---:|---:|---:|---:|---:|---:|",
     ]
     for r in summary_rows:
-        pub_p = f"{r['public_pass_at_1_pct']:.1f}%" if r["public_pass_at_1_pct"] is not None else "—"
-        pub_c = f"${r['public_cost_usd']:.2f}" if r["public_cost_usd"] is not None else "—"
         md_lines.append(
-            f"| `{r['candidate_key']}` | **{r['pass_at_1_pct']:.1f}%** | {r['mean_reward_pct']:.1f}% | "
+            f"| `{r['candidate_key']}` | **{r['pass_at_1_pct']:.1f}%** | "
             f"{r['pydantic_pass_pct']:.0f}% | {r['marimo_pass_pct']:.0f}% | **${r['mean_cost_usd']:.3f}** | "
-            f"{r['cache_hit_pct']:.1f}% | {r['mean_duration_sec']:.0f}s | {pub_p} | {pub_c} |"
+            f"{r['cache_hit_pct']:.1f}% | {r['mean_duration_sec']:.0f}s |"
         )
 
     (args.out_dir / "r2b_summary.md").write_text("\n".join(md_lines) + "\n", encoding="utf-8")
@@ -302,4 +276,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
